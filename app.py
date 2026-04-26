@@ -947,18 +947,7 @@ def si_no(valor):
 def binario(valor):
     """Convierte booleanos a 1/0 para que Google Sheets guarde dato binario real."""
     return 1 if bool(valor) else 0
-def sanitizar_para_gsheets(df):
-    df = df.copy()
-    for col in df.columns:
-        if pd.api.types.is_integer_dtype(df[col]):
-            df[col] = df[col].fillna(0).apply(lambda x: int(x))
-        elif pd.api.types.is_float_dtype(df[col]):
-            df[col] = df[col].fillna(0.0).apply(lambda x: float(x))
-        else:
-            df[col] = df[col].fillna("").apply(
-                lambda x: "" if (isinstance(x, float) and pd.isna(x)) else str(x)
-            )
-    return df
+
 
 def activos_texto(diccionario, etiquetas):
     """Devuelve un resumen legible de los ítems marcados."""
@@ -1206,6 +1195,7 @@ def mostrar_interfaz():
         st.markdown("<small style='color:#64748B;'>Completar para estratificación de riesgo CV integrada y metas terapéuticas individualizadas (SAHA/FAC/SAC 2025)</small>", unsafe_allow_html=True)
 
         col_frc1, col_frc2, col_frc3 = st.columns(3)
+
         with col_frc1:
             st.markdown("**🩺 Factores de Riesgo Clásicos**")
             frc_diabetes    = st.checkbox("🩸 Diabetes mellitus", key="frc_diabetes")
@@ -1314,13 +1304,7 @@ def mostrar_interfaz():
                                 df_act = conn_gs.read(spreadsheet=URL_PLANILLA, worksheet="Pacientes", ttl=0)
                             except TypeError:
                                 df_act = conn_gs.read(spreadsheet=URL_PLANILLA, worksheet="Pacientes")
-                            df_fin = sanitizar_para_gsheets(df_fin)
 
-                            conn_gs.update(spreadsheet=URL_PLANILLA, worksheet="Pacientes", data=df_fin)
-                            st.success("✅ Guardado en Google Sheets.")
-                         except Exception as e:
-                            st.warning(f"⚠️ No se pudo guardar en la nube: {e}")
-                    pdf_bytes = generar_pdf(datos_actuales, res)
                             registro_gs = preparar_registro_gs(datos_actuales, res)
                             df_fin = normalizar_dataframe_gs(df_act, registro_gs)
 
