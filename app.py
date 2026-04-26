@@ -1206,7 +1206,6 @@ def mostrar_interfaz():
         st.markdown("<small style='color:#64748B;'>Completar para estratificación de riesgo CV integrada y metas terapéuticas individualizadas (SAHA/FAC/SAC 2025)</small>", unsafe_allow_html=True)
 
         col_frc1, col_frc2, col_frc3 = st.columns(3)
-URL_PLANILLA = "https://docs.google.com/spreadsheets/d/1pQVDwWeKH1PKU9eR5mzLJb16cNwqEVENNIr9MyyzWnA/edit"
         with col_frc1:
             st.markdown("**🩺 Factores de Riesgo Clásicos**")
             frc_diabetes    = st.checkbox("🩸 Diabetes mellitus", key="frc_diabetes")
