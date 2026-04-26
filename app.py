@@ -1095,7 +1095,7 @@ def resetear_evaluacion():
 def mostrar_interfaz():
     try:
         conn_gs      = st.connection("gsheets", type=GSheetsConnection)
-        URL_PLANILLA = "https://docs.google.com/spreadsheets/d/1eyomkv_hJHjvA2v00Dt6GSknnDchda3CtzIeWBYXIfQ/edit"
+        URL_PLANILLA = "https://docs.google.com/spreadsheets/d/1pQVDwWeKH1PKU9eR5mzLJb16cNwqEVENNIr9MyyzWnA/edit?gid=0#gid=0"
     except:
         conn_gs = None
 
