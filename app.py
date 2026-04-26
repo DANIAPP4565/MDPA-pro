@@ -1319,10 +1319,9 @@ URL_PLANILLA = "https://docs.google.com/spreadsheets/d/1pQVDwWeKH1PKU9eR5mzLJb16
 
                             conn_gs.update(spreadsheet=URL_PLANILLA, worksheet="Pacientes", data=df_fin)
                             st.success("✅ Guardado en Google Sheets.")
-                        except Exception as e:
+                         except Exception as e:
                             st.warning(f"⚠️ No se pudo guardar en la nube: {e}")
-                            with st.expander("🔍 Detalle técnico del error"):
-                                st.exception(e)
+                    pdf_bytes = generar_pdf(datos_actuales, res)
                             registro_gs = preparar_registro_gs(datos_actuales, res)
                             df_fin = normalizar_dataframe_gs(df_act, registro_gs)
 
