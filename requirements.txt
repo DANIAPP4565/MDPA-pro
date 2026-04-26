@@ -1,0 +1,7 @@
+streamlit>=1.28
+pandas
+st-gsheets-connection
+fpdf
+gspread
+google-auth
+validators
