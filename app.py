@@ -13,7 +13,18 @@ import io
 st.set_page_config(page_title="MDPA 2026 · HTA Argentina", layout="wide", page_icon="❤️")
 
 AUTOR_APP = "Ricardo Daniel Olano, Especialista en Cardiologia y en Hipertension arterial"
-URL_PLANILLA = "https://docs.google.com/spreadsheets/d/1pQVDwWeKH1PKU9eR5mzLJb16cNwqEVENNIr9MyyzWnA/edit?gid=0#gid=0"
+
+# URL editable desde Streamlit Cloud > Settings > Secrets.
+# Importante: usar URL normal de edición de Google Sheets, NO la URL publicada /pubhtml.
+URL_PLANILLA_DEFAULT = "https://docs.google.com/spreadsheets/d/1pQVDwWeKH1PKU9eR5mzLJb16cNwqEVENNIr9MyyzWnA/edit?gid=0#gid=0"
+
+def obtener_url_planilla():
+    try:
+        return st.secrets.get("connections", {}).get("gsheets", {}).get("spreadsheet", URL_PLANILLA_DEFAULT)
+    except Exception:
+        return URL_PLANILLA_DEFAULT
+
+URL_PLANILLA = obtener_url_planilla()
 WORKSHEETS_POSIBLES = ["Pacientes", "Hoja 1", "Hoja1", "Sheet1"]
 
 # ── CSS TEMÁTICA SALUD ────────────────────────────────────
@@ -1143,7 +1154,9 @@ def normalizar_dataframe_gs(df_act, registro_gs):
 
 def conectar_google_sheets():
     try:
-        return st.connection("gsheets", type=GSheetsConnection)
+        conn = st.connection("gsheets", type=GSheetsConnection)
+        st.session_state.pop("gsheets_error", None)
+        return conn
     except Exception as e:
         st.session_state["gsheets_error"] = str(e)
         return None
@@ -1165,31 +1178,57 @@ def leer_google_sheets(conn_gs):
     return pd.DataFrame(), None
 
 def guardar_google_sheets(conn_gs, datos, res):
+    """
+    Guarda un registro en Google Sheets de forma robusta.
+    Correcciones principales:
+    - Usa URL_PLANILLA normal de edición, no URL publicada /pubhtml.
+    - Mantiene columnas binarias 1/0 para FRC, DOB y ECV/renal establecida.
+    - Conserva columnas existentes y agrega columnas nuevas sin perder historial.
+    """
     if conn_gs is None:
         return False, "Google Sheets no está configurado. Revisá secrets.toml y compartí la planilla con el service account."
+
     try:
         df_act, worksheet_usada = leer_google_sheets(conn_gs)
-        if worksheet_usada is None:
-            worksheet_usada = WORKSHEETS_POSIBLES[0]
+        worksheet_usada = worksheet_usada or WORKSHEETS_POSIBLES[0]
+
         registro_gs = preparar_registro_gs(datos, res)
         df_fin = normalizar_dataframe_gs(df_act, registro_gs)
-        columnas_binarias = [c for c in df_fin.columns if c.startswith(("frc_", "dob_", "ece_")) or c in [
-            "tratamiento_antihipertensivo",
-            "tiene_dano_organo_blanco",
-            "tiene_enfermedad_cv_renal_establecida",
-        ]]
+
+        columnas_binarias = [
+            c for c in df_fin.columns
+            if c.startswith(("frc_", "dob_", "ece_"))
+            or c in [
+                "tratamiento_antihipertensivo",
+                "tiene_dano_organo_blanco",
+                "tiene_enfermedad_cv_renal_establecida",
+            ]
+        ]
         for col in columnas_binarias:
             if not col.endswith("_txt") and not col.startswith("resumen_"):
                 df_fin[col] = pd.to_numeric(df_fin[col], errors="coerce").fillna(0).astype(int)
-        conn_gs.update(
-    spreadsheet="https://docs.google.com/spreadsheets/d/e/2PACX-1vSkpTq2JhFI21b5IMSn8tl96dG2OGe_ec26rXRnXKL6CtMbrOeL08ynALgepcJEf4kGaSanUaj_RBEN/pubhtml",
-    worksheet=worksheet_usada,
-    data=df_fin
-)
-        return True, f"Guardado en Google Sheets, hoja: {worksheet_usada}."
-    except Exception as e:
-        return False, f"No se pudo guardar en Google Sheets: {e}"
 
+        # Limpieza final para evitar errores de serialización en Google Sheets.
+        df_fin = df_fin.fillna("")
+
+        try:
+            conn_gs.update(
+                spreadsheet=URL_PLANILLA,
+                worksheet=worksheet_usada,
+                data=df_fin,
+            )
+        except TypeError:
+            # Compatibilidad con versiones anteriores del conector.
+            conn_gs.update(
+                worksheet=worksheet_usada,
+                data=df_fin,
+            )
+
+        return True, f"Guardado en Google Sheets, hoja: {worksheet_usada}."
+
+    except Exception as e:
+        st.session_state["gsheets_error"] = str(e)
+        return False, f"No se pudo guardar en Google Sheets: {e}"
 
 
 CAMPOS_EVALUACION_DEFAULTS = {
@@ -1221,6 +1260,8 @@ def resetear_evaluacion():
     """Restablece todos los campos del formulario a sus valores iniciales."""
     for clave, valor in CAMPOS_EVALUACION_DEFAULTS.items():
         st.session_state[clave] = valor
+    # Mantiene la matrícula del médico logueado para no tener que cargarla nuevamente.
+    st.session_state["matricula_medico"] = st.session_state.get("matricula", "") or ""
 
 # =========================================================
 # 6. INTERFAZ PRINCIPAL
@@ -1261,6 +1302,8 @@ def mostrar_interfaz():
         st.markdown("---")
         if st.button("🚪 Cerrar Sesión", use_container_width=True):
             st.session_state["auth"] = False
+            st.session_state["user"] = None
+            st.session_state["matricula"] = ""
             st.rerun()
 
     # ── HEADER ────────────────────────────────────────
