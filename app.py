@@ -1482,6 +1482,7 @@ client_x509_cert_url = "..."
 # 7. LOGIN
 # =========================================================
 if not st.session_state["auth"]:
+
     st.markdown(f"""
     <div style="max-width:520px;margin:60px auto 0;background:#fff;border-radius:20px;
                 padding:40px 44px;box-shadow:0 8px 32px rgba(11,79,138,0.13);border-top:6px solid #0B4F8A;">
@@ -1491,49 +1492,61 @@ if not st.session_state["auth"]:
             <p style="color:#111827;font-size:0.88em;margin:0;">
                 Guía Argentina de Hipertensión Arterial 2025<br>SAHA / FAC / SAC
             </p>
-            <p style="color:#111827;font-size:0.82em;font-weight:700;margin-top:10px;">Autor: {AUTOR_APP}</p>
+            <p style="color:#111827;font-size:0.82em;font-weight:700;margin-top:10px;">
+                Autor: {AUTOR_APP}
+            </p>
         </div>
-    </div>""", unsafe_allow_html=True)
+    </div>
+    """, unsafe_allow_html=True)
 
     _, col_c, _ = st.columns([1, 1.6, 1])
+
     with col_c:
         t1, t2 = st.tabs(["🔑 Ingresar", "📝 Registrarse"])
+
         with t1:
             with st.form("form_login", clear_on_submit=False):
                 u = st.text_input("Usuario médico", placeholder="usuario", key="login_usuario")
                 p = st.text_input("Contraseña", type="password", placeholder="••••••••", key="login_password")
                 ingresar = st.form_submit_button("Ingresar al sistema", use_container_width=True)
+
             if ingresar:
                 usuario_ok = verificar_u(u, p)
+
                 if usuario_ok:
                     st.session_state["auth"] = True
-                    st.session_state["user"] = usuario_ok.get("usuario", (u or "").strip())
+                    st.session_state["user"] = usuario_ok.get("usuario", normalizar_usuario(u))
                     st.session_state["matricula"] = usuario_ok.get("matricula", "") or ""
-                    st.success("Ingreso correcto.")
+                    st.success("✅ Ingreso correcto.")
                     st.rerun()
                 else:
                     st.error("Credenciales incorrectas o campos incompletos.")
+
         with t2:
             with st.form("form_registro", clear_on_submit=False):
                 nu = st.text_input("Apellido y nombre del médico", placeholder="Dr. Apellido", key="reg_usuario")
                 nm = st.text_input("Matrícula médica", placeholder="Ej.: MP 123456", key="reg_matricula")
                 np = st.text_input("Contraseña nueva", type="password", placeholder="••••••••", key="reg_password")
                 crear = st.form_submit_button("Crear cuenta médica", use_container_width=True)
-            if crear:
-    ok, mensaje = registrar_usuario(nu, np, nm)
 
-    if ok:
-        st.session_state["auth"] = True
-        st.session_state["user"] = normalizar_usuario(nu)
-        st.session_state["matricula"] = (nm or "").strip()
-        st.success("✅ Cuenta creada e ingreso correcto.")
-        st.rerun()
-    else:
-        st.warning("⚠️ " + mensaje)
+            if crear:
+                ok, mensaje = registrar_usuario(nu, np, nm)
+
+                if ok:
+                    st.session_state["auth"] = True
+                    st.session_state["user"] = normalizar_usuario(nu)
+                    st.session_state["matricula"] = (nm or "").strip()
+                    st.success("✅ Cuenta creada e ingreso correcto.")
+                    st.rerun()
+                else:
+                    st.warning("⚠️ " + mensaje)
+
     st.markdown(f"""
     <div style="text-align:center;color:#111827;font-size:0.78em;margin-top:30px;">
         MDPA 2026 Pro · Herramienta de apoyo diagnóstico · Uso exclusivo del profesional médico<br>
         {AUTOR_APP}
-    </div>""", unsafe_allow_html=True)
+    </div>
+    """, unsafe_allow_html=True)
+
 else:
     mostrar_interfaz()
