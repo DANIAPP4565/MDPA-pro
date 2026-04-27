@@ -1482,7 +1482,7 @@ def mostrar_interfaz():
                         with st.expander("Configuración necesaria para Google Sheets"):
                             st.code("""# .streamlit/secrets.toml
 [connections.gsheets]
-spreadsheet = "TU_URL_DE_GOOGLE_SHEETS"
+spreadsheet = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSkpTq2JhFI21b5IMSn8tl96dG2OGe_ec26rXRnXKL6CtMbrOeL08ynALgepcJEf4kGaSanUaj_RBEN/pubhtml"
 
 [gcp_service_account]
 type = "service_account"
