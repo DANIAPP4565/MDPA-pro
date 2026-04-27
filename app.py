@@ -1142,7 +1142,11 @@ def guardar_google_sheets(conn_gs, datos, res):
         for col in columnas_binarias:
             if not col.endswith("_txt") and not col.startswith("resumen_"):
                 df_fin[col] = pd.to_numeric(df_fin[col], errors="coerce").fillna(0).astype(int)
-        conn_gs.update(spreadsheet="https://docs.google.com/spreadsheets/d/e/2PACX-1vSkpTq2JhFI21b5IMSn8tl96dG2OGe_ec26rXRnXKL6CtMbrOeL08ynALgepcJEf4kGaSanUaj_RBEN/pubhtml, worksheet=worksheet_usada, data=df_fin)"
+        conn_gs.update(
+    spreadsheet="https://docs.google.com/spreadsheets/d/e/2PACX-1vSkpTq2JhFI21b5IMSn8tl96dG2OGe_ec26rXRnXKL6CtMbrOeL08ynALgepcJEf4kGaSanUaj_RBEN/pubhtml",
+    worksheet=worksheet_usada,
+    data=df_fin
+)
         return True, f"Guardado en Google Sheets, hoja: {worksheet_usada}."
     except Exception as e:
         return False, f"No se pudo guardar en Google Sheets: {e}"
