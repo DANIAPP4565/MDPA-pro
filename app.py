@@ -104,11 +104,11 @@ section[data-testid="stSidebar"] h3 { color: #FFFFFF !important; }
     font-weight: 800; font-size: 0.92em;
     letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 12px;
 }
-.ct-cons { color: #1976C8; }
-.ct-mdpa { color: #17A589; }
-.ct-mapa { color: #7B68EE; }
-.ct-diu  { color: #F39C12; }
-.ct-noc  { color: #5D6D7E; }
+.ct-cons { color: #0D5FA3; }
+.ct-mdpa { color: #0E6B47; }
+.ct-mapa { color: #4B3DB8; }
+.ct-diu  { color: #92400E; }  /* oscurecido para contraste sobre fondo blanco */
+.ct-noc  { color: #374151; }
 
 /* ─── SEMÁFOROS ────────────────────────────────────────── */
 .sema-pill {
@@ -127,9 +127,9 @@ section[data-testid="stSidebar"] h3 { color: #FFFFFF !important; }
 .sema-rojo     { background: var(--rojo-bg);     color: var(--rojo);     border-color: #7B1217; }
 
 .sema-label {
-    font-size: 0.72em; font-weight: 700;
+    font-size: 0.75em; font-weight: 700;
     letter-spacing: 0.06em; text-transform: uppercase;
-    margin-right: 4px; opacity: 0.75;
+    margin-right: 4px; color: #374151;
 }
 
 section[data-testid="stSidebar"] .sidebar-sema,
@@ -584,7 +584,7 @@ class HTA_PDF(FPDF):
         self.set_text_color(180,210,255); self.set_font("Arial","I",7.5)
         self.cell(0,10,
             f"MDPA 2026 Pro  *  Pag. {self.page_no()}  *  {datetime.now().strftime('%d/%m/%Y %H:%M')}  *  "
-            "Guia Argentina HTA 2025 (SAHA/FAC/SAC)  *  Uso exclusivo profesional medico",align="C")
+            "Dr. Ricardo Daniel Olano, Esp. Cardiologia e Hipertension Arterial  *  SAHA/FAC/SAC 2025",align="C")
 
     def sec(self, titulo, r=11, g=79, b=138):
         self.ln(3); self.set_fill_color(r,g,b); self.set_text_color(255,255,255)
@@ -920,6 +920,11 @@ def generar_pdf(datos, res):
     pdf.set_draw_color(*AZUL_OSC); pdf.set_line_width(0.5); pdf.line(20,pdf.get_y(),100,pdf.get_y())
     pdf.ln(3); pdf.set_font("Arial","I",9)
     pdf.cell(0,5,f"              Firma y sello - Dr. {d['medico']}",ln=True); pdf.ln(6)
+    pdf.set_fill_color(*AZUL_CLR); pdf.set_text_color(*AZUL_OSC); pdf.set_font("Arial","B",8.5)
+    pdf.cell(0,8,"  Aplicacion desarrollada por: Dr. Ricardo Daniel Olano",ln=True,fill=True)
+    pdf.set_font("Arial","",8); pdf.set_text_color(0,0,0)
+    pdf.cell(0,7,"  Especialista en Cardiologia y en Hipertension Arterial | MDPA 2026 Pro",ln=True)
+    pdf.ln(4)
     pdf.set_fill_color(*GRIS_CLR); pdf.set_font("Arial","I",7.5); pdf.set_text_color(90,90,90)
     pdf.multi_cell(0,5,
         "AVISO LEGAL: Este informe fue generado por MDPA 2026 Pro como herramienta de apoyo diagnostico "
@@ -1093,11 +1098,16 @@ def resetear_evaluacion():
 # 6. INTERFAZ PRINCIPAL
 # =========================================================
 def mostrar_interfaz():
+    URL_PLANILLA = "https://docs.google.com/spreadsheets/d/1pQVDwWeKH1PKU9eR5mzLJb16cNwqEVENNIr9MyyzWnA/edit?gid=0#gid=0"
+    conn_gs = None
+    gs_error = None
     try:
-        conn_gs      = st.connection("gsheets", type=GSheetsConnection)
-        URL_PLANILLA = "https://docs.google.com/spreadsheets/d/1pQVDwWeKH1PKU9eR5mzLJb16cNwqEVENNIr9MyyzWnA/edit?gid=0#gid=0"
-    except:
+        conn_gs = st.connection("gsheets", type=GSheetsConnection)
+        # Prueba de conectividad temprana
+        _ = conn_gs.read(spreadsheet=URL_PLANILLA, worksheet="Pacientes", ttl=60)
+    except Exception as e:
         conn_gs = None
+        gs_error = str(e)
 
     # ── SIDEBAR ───────────────────────────────────────
     with st.sidebar:
@@ -1131,6 +1141,22 @@ def mostrar_interfaz():
         if st.button("🚪 Cerrar Sesión", use_container_width=True):
             st.session_state["auth"] = False
             st.rerun()
+        st.markdown("---")
+        if conn_gs:
+            st.markdown('<div style="font-size:0.78em;color:#86EFAC;font-weight:700;">☁️ Google Sheets · Conectado</div>', unsafe_allow_html=True)
+        else:
+            st.markdown('<div style="font-size:0.78em;color:#FCA5A5;font-weight:700;">⚠️ Google Sheets · Sin conexión</div>', unsafe_allow_html=True)
+            if gs_error:
+                with st.expander("Ver error de conexión"):
+                    st.code(gs_error, language=None)
+        st.markdown("---")
+        st.markdown("""
+        <div style="font-size:0.72em;color:#93C5FD;line-height:1.7em;text-align:center;padding:8px 0 4px;">
+            <b style="color:#DBEAFE;">Desarrollado por:</b><br>
+            Dr. Ricardo Daniel Olano<br>
+            Especialista en Cardiología<br>
+            y en Hipertensión Arterial
+        </div>""", unsafe_allow_html=True)
 
     # ── HEADER ────────────────────────────────────────
     st.markdown("""
@@ -1192,7 +1218,7 @@ def mostrar_interfaz():
 
         # ── SECCIÓN: FACTORES DE RIESGO CV ──────────────────
         st.markdown('<div class="seccion-titulo">⚠️ Factores de Riesgo Cardiovascular · Guía Argentina HTA 2025</div>', unsafe_allow_html=True)
-        st.markdown("<small style='color:#64748B;'>Completar para estratificación de riesgo CV integrada y metas terapéuticas individualizadas (SAHA/FAC/SAC 2025)</small>", unsafe_allow_html=True)
+        st.markdown("<small style='color:#374151;font-weight:600;'>Completar para estratificación de riesgo CV integrada y metas terapéuticas individualizadas (SAHA/FAC/SAC 2025)</small>", unsafe_allow_html=True)
 
         col_frc1, col_frc2, col_frc3 = st.columns(3)
 
@@ -1262,7 +1288,7 @@ def mostrar_interfaz():
             st.markdown(f'PP 24h: <span class="chip {pp_c}">{res["pp_24h"]} mmHg</span>', unsafe_allow_html=True)
 
         st.markdown("#### 🧭 Clasificación del fenotipo hipertensivo · válido solo para MAPA")
-        st.markdown("<small style='color:#64748B;'>Umbrales: 24 h ≥130/80 mmHg · diurno ≥135/85 mmHg · nocturno ≥120/70 mmHg</small>", unsafe_allow_html=True)
+        st.markdown("<small style='color:#374151;font-weight:600;'>Umbrales: 24 h ≥130/80 mmHg · diurno ≥135/85 mmHg · nocturno ≥120/70 mmHg</small>", unsafe_allow_html=True)
         if res.get("fenotipo_mapa"):
             st.markdown(f'<span class="badge badge-sostenida">{res["fenotipo_mapa"]}</span>', unsafe_allow_html=True)
         else:
@@ -1320,7 +1346,10 @@ def mostrar_interfaz():
                             conn_gs.update(spreadsheet=URL_PLANILLA, worksheet="Pacientes", data=df_fin)
                             st.success("✅ Guardado en Google Sheets con variables dicotómicas binarias 1/0.")
                         except Exception as e:
-                            st.warning(f"⚠️ No se pudo guardar en la nube: {e}")
+                            st.error(f"❌ Error al guardar en Google Sheets: {type(e).__name__}: {e}")
+                            st.info("💡 Verificá que `secrets.toml` tenga la sección `[connections.gsheets]` con las credenciales de la cuenta de servicio.")
+                    else:
+                        st.warning("⚠️ Google Sheets no está disponible. El registro no se guardó en la nube.")
                     pdf_bytes = generar_pdf(datos_actuales, res)
                     st.download_button(
                         label="📄 Descargar Informe PDF Completo",
@@ -1377,8 +1406,9 @@ if not st.session_state["auth"]:
                 else: st.warning("⚠️ El usuario ya existe.")
 
     st.markdown("""
-    <div style="text-align:center;color:#94A3B8;font-size:0.78em;margin-top:30px;">
-        MDPA 2026 Pro · Herramienta de apoyo diagnóstico · Uso exclusivo del profesional médico
+    <div style="text-align:center;color:#475569;font-size:0.78em;margin-top:30px;">
+        MDPA 2026 Pro · Herramienta de apoyo diagnóstico · Uso exclusivo del profesional médico<br>
+        <span style="color:#374151;font-weight:600;">Dr. Ricardo Daniel Olano · Especialista en Cardiología y en Hipertensión Arterial</span>
     </div>""", unsafe_allow_html=True)
 else:
     mostrar_interfaz()
