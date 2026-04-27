@@ -1103,8 +1103,6 @@ def mostrar_interfaz():
     gs_error = None
     try:
         conn_gs = st.connection("gsheets", type=GSheetsConnection)
-        # Prueba de conectividad temprana
-        _ = conn_gs.read(spreadsheet=URL_PLANILLA, worksheet="Pacientes", ttl=60)
     except Exception as e:
         conn_gs = None
         gs_error = str(e)
@@ -1143,12 +1141,22 @@ def mostrar_interfaz():
             st.rerun()
         st.markdown("---")
         if conn_gs:
-            st.markdown('<div style="font-size:0.78em;color:#86EFAC;font-weight:700;">☁️ Google Sheets · Conectado</div>', unsafe_allow_html=True)
+            st.markdown('<div style="font-size:0.78em;color:#86EFAC;font-weight:700;">☁️ Google Sheets · Configurado</div>', unsafe_allow_html=True)
         else:
-            st.markdown('<div style="font-size:0.78em;color:#FCA5A5;font-weight:700;">⚠️ Google Sheets · Sin conexión</div>', unsafe_allow_html=True)
+            st.markdown('<div style="font-size:0.78em;color:#FCA5A5;font-weight:700;">⚠️ Google Sheets · Sin configurar</div>', unsafe_allow_html=True)
             if gs_error:
-                with st.expander("Ver error de conexión"):
+                with st.expander("Ver error"):
                     st.code(gs_error, language=None)
+                    st.markdown("""
+<small>Verificá que exista <code>.streamlit/secrets.toml</code> con:
+<pre>[connections.gsheets]
+type = "service_account"
+project_id = "..."
+private_key_id = "..."
+private_key = "-----BEGIN RSA PRIVATE KEY-----\\n..."
+client_email = "...@....iam.gserviceaccount.com"
+client_id = "..."
+token_uri = "https://oauth2.googleapis.com/token"</pre></small>""", unsafe_allow_html=True)
         st.markdown("---")
         st.markdown("""
         <div style="font-size:0.72em;color:#93C5FD;line-height:1.7em;text-align:center;padding:8px 0 4px;">
