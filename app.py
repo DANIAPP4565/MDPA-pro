@@ -12,6 +12,10 @@ import io
 # =========================================================
 st.set_page_config(page_title="MDPA 2026 · HTA Argentina", layout="wide", page_icon="❤️")
 
+AUTOR_APP = "Ricardo Daniel Olano, Especialista en Cardiologia y en Hipertension arterial"
+URL_PLANILLA = "https://docs.google.com/spreadsheets/d/1pQVDwWeKH1PKU9eR5mzLJb16cNwqEVENNIr9MyyzWnA/edit?gid=0#gid=0"
+WORKSHEETS_POSIBLES = ["Pacientes", "Hoja 1", "Hoja1", "Sheet1"]
+
 # ── CSS TEMÁTICA SALUD ────────────────────────────────────
 st.markdown("""
 <style>
@@ -208,6 +212,15 @@ section[data-testid="stSidebar"] .sidebar-sema b {
 .stTabs [aria-selected="true"] { background: #0B4F8A !important; color: #FFFFFF !important; }
 
 hr { border-color: #CBD5E1 !important; }
+/* Contraste reforzado */
+.card, .diag-panel, .stAlert, [data-testid="stMetric"] { color:#111827 !important; }
+.card *, .diag-panel *, [data-testid="stMetric"] * { color:#111827 !important; }
+.app-header *, .seccion-titulo, .seccion-titulo * { color:#FFFFFF !important; }
+.stMarkdown, .stTextInput label, .stNumberInput label, .stCheckbox label { color:#111827 !important; }
+input, textarea, select { background:#FFFFFF !important; color:#111827 !important; }
+.stTabs [data-baseweb="tab"] p { color:#111827 !important; }
+.stTabs [aria-selected="true"] p { color:#FFFFFF !important; }
+.autor-app { margin-top:10px; font-size:0.82em; font-weight:700; color:#FFFFFF !important; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -215,54 +228,78 @@ hr { border-color: #CBD5E1 !important; }
 # 2. BASE DE DATOS
 # =========================================================
 def crear_db():
-    conn = sqlite3.connect("usuarios.db")
+    """Crea/migra la base local de usuarios. Incluye matricula médica."""
+    conn = sqlite3.connect("usuarios.db", check_same_thread=False)
     c = conn.cursor()
-    c.execute("CREATE TABLE IF NOT EXISTS usuarios (usuario TEXT PRIMARY KEY, password TEXT)")
-    c.execute("SELECT * FROM usuarios WHERE usuario='admin'")
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS usuarios (
+            usuario TEXT PRIMARY KEY,
+            password TEXT NOT NULL,
+            matricula TEXT DEFAULT ''
+        )
+    """)
+    c.execute("PRAGMA table_info(usuarios)")
+    columnas = [fila[1] for fila in c.fetchall()]
+    if "matricula" not in columnas:
+        c.execute("ALTER TABLE usuarios ADD COLUMN matricula TEXT DEFAULT ''")
+    c.execute("SELECT usuario FROM usuarios WHERE usuario=?", ("admin",))
     if not c.fetchone():
         pw = hashlib.sha256("12345".encode()).hexdigest()
-        c.execute("INSERT INTO usuarios VALUES (?,?)", ("admin", pw))
+        c.execute("INSERT INTO usuarios (usuario, password, matricula) VALUES (?,?,?)", ("admin", pw, ""))
     conn.commit(); conn.close()
 
 def verificar_u(usuario, password):
+    usuario = (usuario or "").strip()
+    password = (password or "").strip()
+    if not usuario or not password:
+        return None
     pw = hashlib.sha256(password.encode()).hexdigest()
-    conn = sqlite3.connect("usuarios.db")
+    conn = sqlite3.connect("usuarios.db", check_same_thread=False)
+    conn.row_factory = sqlite3.Row
     c = conn.cursor()
-    c.execute("SELECT * FROM usuarios WHERE usuario=? AND password=?", (usuario, pw))
-    r = c.fetchone(); conn.close(); return r
+    c.execute("SELECT usuario, matricula FROM usuarios WHERE usuario=? AND password=?", (usuario, pw))
+    r = c.fetchone(); conn.close()
+    return dict(r) if r else None
 
-def registrar_usuario(usuario, password):
+def registrar_usuario(usuario, password, matricula=""):
+    usuario = (usuario or "").strip()
+    password = (password or "").strip()
+    matricula = (matricula or "").strip()
+    if not usuario or not password:
+        return False, "Debe completar usuario y contraseña."
     pw = hashlib.sha256(password.encode()).hexdigest()
     try:
-        conn = sqlite3.connect("usuarios.db")
+        conn = sqlite3.connect("usuarios.db", check_same_thread=False)
         c = conn.cursor()
-        c.execute("INSERT INTO usuarios VALUES (?,?)", (usuario, pw))
-        conn.commit(); conn.close(); return True
+        c.execute("INSERT INTO usuarios (usuario, password, matricula) VALUES (?,?,?)", (usuario, pw, matricula))
+        conn.commit(); conn.close()
+        return True, "Cuenta creada. Podés iniciar sesión."
     except sqlite3.IntegrityError:
-        return False
+        return False, "El usuario ya existe."
 
 crear_db()
 if "auth" not in st.session_state: st.session_state["auth"] = False
 if "user" not in st.session_state: st.session_state["user"] = None
+if "matricula" not in st.session_state: st.session_state["matricula"] = ""
 
 # =========================================================
 # 3. GUÍA ARGENTINA HTA 2025 — UMBRALES
 # =========================================================
 GUIA = {
-    "cons":  {"pas": [(120,"verde"),(130,"amarillo"),(140,"naranja"),(999,"rojo")],
-               "pad": [(80,"verde"),(85,"amarillo"),(90,"naranja"),(999,"rojo")],
+    "cons":  {"pas": [(140,"verde"),(160,"naranja"),(180,"rojo"),(999,"rojo")],
+               "pad": [(90,"verde"),(100,"naranja"),(110,"rojo"),(999,"rojo")],
                "ref_pas":"<140", "ref_pad":"<90", "nombre":"Consultorio"},
-    "mdpa":  {"pas": [(120,"verde"),(125,"amarillo"),(135,"naranja"),(999,"rojo")],
-               "pad": [(75,"verde"),(80,"amarillo"),(85,"naranja"),(999,"rojo")],
+    "mdpa":  {"pas": [(135,"verde"),(150,"naranja"),(170,"rojo"),(999,"rojo")],
+               "pad": [(85,"verde"),(95,"naranja"),(105,"rojo"),(999,"rojo")],
                "ref_pas":"<135", "ref_pad":"<85", "nombre":"MDPA Domiciliaria"},
-    "24h":   {"pas": [(115,"verde"),(120,"amarillo"),(130,"naranja"),(999,"rojo")],
-               "pad": [(70,"verde"),(75,"amarillo"),(80,"naranja"),(999,"rojo")],
+    "24h":   {"pas": [(130,"verde"),(145,"naranja"),(165,"rojo"),(999,"rojo")],
+               "pad": [(80,"verde"),(90,"naranja"),(100,"rojo"),(999,"rojo")],
                "ref_pas":"<130", "ref_pad":"<80", "nombre":"MAPA 24 horas"},
-    "diurno":{"pas": [(120,"verde"),(128,"amarillo"),(135,"naranja"),(999,"rojo")],
-               "pad": [(75,"verde"),(80,"amarillo"),(85,"naranja"),(999,"rojo")],
+    "diurno":{"pas": [(135,"verde"),(150,"naranja"),(170,"rojo"),(999,"rojo")],
+               "pad": [(85,"verde"),(95,"naranja"),(105,"rojo"),(999,"rojo")],
                "ref_pas":"<135", "ref_pad":"<85", "nombre":"MAPA Diurno"},
-    "noct":  {"pas": [(105,"verde"),(110,"amarillo"),(120,"naranja"),(999,"rojo")],
-               "pad": [(60,"verde"),(65,"amarillo"),(70,"naranja"),(999,"rojo")],
+    "noct":  {"pas": [(120,"verde"),(135,"naranja"),(155,"rojo"),(999,"rojo")],
+               "pad": [(70,"verde"),(80,"naranja"),(90,"rojo"),(999,"rojo")],
                "ref_pas":"<120", "ref_pad":"<70", "nombre":"MAPA Nocturno"},
 }
 
@@ -506,8 +543,8 @@ def texto_fenotipo_mapa(fenotipo, datos):
 # =========================================================
 # 5. PDF COMPLETO
 # =========================================================
-VERDE_PDF  = (27,126,74);  AMARI_PDF = (200,150,0)
-NARAN_PDF  = (180,70,0);   ROJO_PDF  = (155,20,30)
+VERDE_PDF  = (212,237,218); AMARI_PDF = (255,243,205)
+NARAN_PDF  = (255,224,194); ROJO_PDF  = (248,215,218)
 AZUL_OSC   = (11,79,138);  AZUL_MED  = (25,118,200)
 AZUL_CLR   = (214,234,248);GRIS_CLR  = (240,244,248)
 BLANCO     = (255,255,255)
@@ -525,7 +562,7 @@ def col_pad(val, tipo):
     return ROJO_PDF
 
 def lum(c): return 0.299*c[0]+0.587*c[1]+0.114*c[2]
-def tc(c):  return (255,255,255) if lum(c)<140 else (20,20,20)
+def tc(c): return (0,0,0) if lum(c) >= 120 else (255,255,255)
 def nivel_label(n): return {"verde":"Normal","amarillo":"Elevado","naranja":"Alto","rojo":"Muy Alto"}[n]
 
 
@@ -630,6 +667,8 @@ def generar_pdf(datos, res):
     rows_info = [
         ("Paciente",            d['nombre']),
         ("Medico responsable",  f"Dr. {d['medico']}"),
+        ("Matricula medico",    d.get("matricula", "")),
+        ("Autor de la app",     AUTOR_APP),
         ("Fecha del estudio",   d['fecha']),
         ("Hora de generacion",  datetime.now().strftime("%H:%M hs")),
         ("Tratamiento activo",  "SI - bajo tratamiento antihipertensivo" if d.get('tratamiento') else "NO - sin tratamiento farmacologico"),
@@ -915,6 +954,8 @@ def generar_pdf(datos, res):
     pdf.sec("9. FIRMA Y RESPONSABILIDAD PROFESIONAL")
     pdf.set_font("Arial","",9)
     pdf.cell(0,7,f"Medico responsable: Dr. {d['medico']}",ln=True)
+    pdf.cell(0,7,f"Matricula: {d.get('matricula', '')}",ln=True)
+    pdf.cell(0,7,f"Autor de la app: {AUTOR_APP}",ln=True)
     pdf.cell(0,7,f"Fecha de emision: {datetime.now().strftime('%d/%m/%Y')} - Hora: {datetime.now().strftime('%H:%M')}",ln=True)
     pdf.ln(18)
     pdf.set_draw_color(*AZUL_OSC); pdf.set_line_width(0.5); pdf.line(20,pdf.get_y(),100,pdf.get_y())
@@ -990,6 +1031,8 @@ def preparar_registro_gs(datos, res):
         "nombre": datos.get("nombre", ""),
         "fecha": datos.get("fecha", ""),
         "medico": datos.get("medico", ""),
+        "matricula_medico": datos.get("matricula", ""),
+        "autor_app": AUTOR_APP,
         "tratamiento_antihipertensivo": binario(datos.get("tratamiento", False)),
         "tratamiento_antihipertensivo_txt": si_no(datos.get("tratamiento", False)),
 
@@ -1059,9 +1102,56 @@ def normalizar_dataframe_gs(df_act, registro_gs):
     columnas_extra = [c for c in df_fin.columns if c not in columnas_nuevas]
     return df_fin[columnas_nuevas + columnas_extra]
 
+def conectar_google_sheets():
+    try:
+        return st.connection("gsheets", type=GSheetsConnection)
+    except Exception as e:
+        st.session_state["gsheets_error"] = str(e)
+        return None
+
+def leer_google_sheets(conn_gs):
+    if conn_gs is None:
+        return pd.DataFrame(), None
+    ultimo_error = None
+    for ws in WORKSHEETS_POSIBLES:
+        try:
+            try:
+                df = conn_gs.read(spreadsheet=URL_PLANILLA, worksheet=ws, ttl=0)
+            except TypeError:
+                df = conn_gs.read(spreadsheet=URL_PLANILLA, worksheet=ws)
+            return (df if df is not None else pd.DataFrame()), ws
+        except Exception as e:
+            ultimo_error = e
+    st.session_state["gsheets_error"] = str(ultimo_error)
+    return pd.DataFrame(), None
+
+def guardar_google_sheets(conn_gs, datos, res):
+    if conn_gs is None:
+        return False, "Google Sheets no está configurado. Revisá secrets.toml y compartí la planilla con el service account."
+    try:
+        df_act, worksheet_usada = leer_google_sheets(conn_gs)
+        if worksheet_usada is None:
+            worksheet_usada = WORKSHEETS_POSIBLES[0]
+        registro_gs = preparar_registro_gs(datos, res)
+        df_fin = normalizar_dataframe_gs(df_act, registro_gs)
+        columnas_binarias = [c for c in df_fin.columns if c.startswith(("frc_", "dob_", "ece_")) or c in [
+            "tratamiento_antihipertensivo",
+            "tiene_dano_organo_blanco",
+            "tiene_enfermedad_cv_renal_establecida",
+        ]]
+        for col in columnas_binarias:
+            if not col.endswith("_txt") and not col.startswith("resumen_"):
+                df_fin[col] = pd.to_numeric(df_fin[col], errors="coerce").fillna(0).astype(int)
+        conn_gs.update(spreadsheet=URL_PLANILLA, worksheet=worksheet_usada, data=df_fin)
+        return True, f"Guardado en Google Sheets, hoja: {worksheet_usada}."
+    except Exception as e:
+        return False, f"No se pudo guardar en Google Sheets: {e}"
+
+
 
 CAMPOS_EVALUACION_DEFAULTS = {
     "nombre_paciente": "",
+    "matricula_medico": "",
     "cpas": 120, "cpad": 80,
     "tratamiento": False,
     "mpas": 115, "mpad": 75,
@@ -1093,11 +1183,7 @@ def resetear_evaluacion():
 # 6. INTERFAZ PRINCIPAL
 # =========================================================
 def mostrar_interfaz():
-    try:
-        conn_gs      = st.connection("gsheets", type=GSheetsConnection)
-        URL_PLANILLA = "https://docs.google.com/spreadsheets/d/1pQVDwWeKH1PKU9eR5mzLJb16cNwqEVENNIr9MyyzWnA/edit?gid=0#gid=0"
-    except:
-        conn_gs = None
+    conn_gs = conectar_google_sheets()
 
     # ── SIDEBAR ───────────────────────────────────────
     with st.sidebar:
@@ -1106,6 +1192,8 @@ def mostrar_interfaz():
             <div style="font-size:3.2em;">❤️</div>
             <div style="font-size:1.15em;font-weight:800;color:#fff;margin-top:6px;">Dr. {st.session_state['user']}</div>
             <div style="font-size:0.78em;color:#93C5FD;letter-spacing:0.05em;text-transform:uppercase;margin-top:2px;">MDPA 2026 Pro</div>
+            <div style="font-size:0.76em;color:#F8FAFC;margin-top:4px;">Matrícula: {st.session_state.get('matricula', '') or 'No informada'}</div>
+            <div class="autor-app">{AUTOR_APP}</div>
         </div>
         """, unsafe_allow_html=True)
         st.markdown("---")
@@ -1235,7 +1323,9 @@ def mostrar_interfaz():
         # Diagnóstico en tiempo real
         datos_actuales = {
             "nombre": nombre or "Sin especificar", "fecha": datetime.now().strftime("%d/%m/%Y"),
-            "medico": st.session_state['user'],    "tratamiento": trat,
+            "medico": st.session_state['user'],
+            "matricula": st.session_state.get("matricula", ""),
+            "tratamiento": trat,
             "c_pas": cpas,    "c_pad": cpad,
             "m_pas": mpas,    "m_pad": mpad,
             "m24_pas": m24s,  "m24_pad": m24d,
@@ -1298,29 +1388,28 @@ def mostrar_interfaz():
                 if not nombre:
                     st.warning("⚠️ Ingresá el nombre del paciente antes de guardar.")
                 else:
-                    if conn_gs:
-                        try:
-                            try:
-                                df_act = conn_gs.read(spreadsheet=URL_PLANILLA, worksheet="Pacientes", ttl=0)
-                            except TypeError:
-                                df_act = conn_gs.read(spreadsheet=URL_PLANILLA, worksheet="Pacientes")
+                    ok_gs, msg_gs = guardar_google_sheets(conn_gs, datos_actuales, res)
+                    if ok_gs:
+                        st.success("✅ " + msg_gs)
+                    else:
+                        st.error("⚠️ " + msg_gs)
+                        with st.expander("Configuración necesaria para Google Sheets"):
+                            st.code("""# .streamlit/secrets.toml
+[connections.gsheets]
+spreadsheet = "TU_URL_DE_GOOGLE_SHEETS"
 
-                            registro_gs = preparar_registro_gs(datos_actuales, res)
-                            df_fin = normalizar_dataframe_gs(df_act, registro_gs)
-
-                            columnas_binarias = [c for c in df_fin.columns if c.startswith(("frc_", "dob_", "ece_")) or c in [
-                                "tratamiento_antihipertensivo",
-                                "tiene_dano_organo_blanco",
-                                "tiene_enfermedad_cv_renal_establecida",
-                            ]]
-                            for col in columnas_binarias:
-                                if not col.endswith("_txt") and not col.startswith("resumen_"):
-                                    df_fin[col] = pd.to_numeric(df_fin[col], errors="coerce").fillna(0).astype(int)
-
-                            conn_gs.update(spreadsheet=URL_PLANILLA, worksheet="Pacientes", data=df_fin)
-                            st.success("✅ Guardado en Google Sheets con variables dicotómicas binarias 1/0.")
-                        except Exception as e:
-                            st.warning(f"⚠️ No se pudo guardar en la nube: {e}")
+[gcp_service_account]
+type = "service_account"
+project_id = "..."
+private_key_id = "..."
+private_key = "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+client_email = "...@...iam.gserviceaccount.com"
+client_id = "..."
+auth_uri = "https://accounts.google.com/o/oauth2/auth"
+token_uri = "https://oauth2.googleapis.com/token"
+auth_provider_x509_cert_url = "https://www.googleapis.com/oauth2/v1/certs"
+client_x509_cert_url = "..."
+""", language="toml")
                     pdf_bytes = generar_pdf(datos_actuales, res)
                     st.download_button(
                         label="📄 Descargar Informe PDF Completo",
@@ -1334,8 +1423,12 @@ def mostrar_interfaz():
         st.markdown("### 📚 Historial de Pacientes")
         if conn_gs:
             try:
-                df = conn_gs.read(spreadsheet=URL_PLANILLA, worksheet="Pacientes")
-                st.dataframe(df, use_container_width=True, hide_index=True)
+                df, ws = leer_google_sheets(conn_gs)
+                if df.empty:
+                    st.info("📭 Sin datos guardados todavía.")
+                else:
+                    st.caption(f"Hoja conectada: {ws}")
+                    st.dataframe(df, use_container_width=True, hide_index=True)
             except:
                 st.info("📭 Sin datos o sin conexión a Google Sheets.")
         else:
@@ -1346,39 +1439,54 @@ def mostrar_interfaz():
 # 7. LOGIN
 # =========================================================
 if not st.session_state["auth"]:
-    st.markdown("""
-    <div style="max-width:460px;margin:60px auto 0;background:#fff;border-radius:20px;
+    st.markdown(f"""
+    <div style="max-width:520px;margin:60px auto 0;background:#fff;border-radius:20px;
                 padding:40px 44px;box-shadow:0 8px 32px rgba(11,79,138,0.13);border-top:6px solid #0B4F8A;">
         <div style="text-align:center;margin-bottom:28px;">
             <div style="font-size:3.5em;">❤️</div>
             <h2 style="font-family:'Playfair Display',serif;color:#0B4F8A;margin:10px 0 4px;">MDPA 2026 Pro</h2>
-            <p style="color:#64748B;font-size:0.88em;margin:0;">
+            <p style="color:#111827;font-size:0.88em;margin:0;">
                 Guía Argentina de Hipertensión Arterial 2025<br>SAHA / FAC / SAC
             </p>
+            <p style="color:#111827;font-size:0.82em;font-weight:700;margin-top:10px;">Autor: {AUTOR_APP}</p>
         </div>
     </div>""", unsafe_allow_html=True)
 
-    _,col_c,_ = st.columns([1,1.6,1])
+    _, col_c, _ = st.columns([1, 1.6, 1])
     with col_c:
-        t1,t2 = st.tabs(["🔑 Ingresar","📝 Registrarse"])
+        t1, t2 = st.tabs(["🔑 Ingresar", "📝 Registrarse"])
         with t1:
-            u = st.text_input("Usuario médico",  placeholder="usuario")
-            p = st.text_input("Contraseña", type="password", placeholder="••••••••")
-            if st.button("Ingresar al sistema", use_container_width=True):
-                if verificar_u(u,p):
-                    st.session_state["auth"] = True; st.session_state["user"] = u; st.rerun()
+            with st.form("form_login", clear_on_submit=False):
+                u = st.text_input("Usuario médico", placeholder="usuario", key="login_usuario")
+                p = st.text_input("Contraseña", type="password", placeholder="••••••••", key="login_password")
+                ingresar = st.form_submit_button("Ingresar al sistema", use_container_width=True)
+            if ingresar:
+                usuario_ok = verificar_u(u, p)
+                if usuario_ok:
+                    st.session_state["auth"] = True
+                    st.session_state["user"] = usuario_ok.get("usuario", (u or "").strip())
+                    st.session_state["matricula"] = usuario_ok.get("matricula", "") or ""
+                    st.success("Ingreso correcto.")
+                    st.rerun()
                 else:
-                    st.error("❌ Credenciales incorrectas.")
+                    st.error("Credenciales incorrectas o campos incompletos.")
         with t2:
-            nu = st.text_input("Apellido y nombre del médico", placeholder="Dr. Apellido")
-            np = st.text_input("Contraseña nueva", type="password", placeholder="••••••••")
-            if st.button("Crear cuenta médica", use_container_width=True):
-                if registrar_usuario(nu,np): st.success("✅ Cuenta creada. Podés iniciar sesión.")
-                else: st.warning("⚠️ El usuario ya existe.")
+            with st.form("form_registro", clear_on_submit=False):
+                nu = st.text_input("Apellido y nombre del médico", placeholder="Dr. Apellido", key="reg_usuario")
+                nm = st.text_input("Matrícula médica", placeholder="Ej.: MP 123456", key="reg_matricula")
+                np = st.text_input("Contraseña nueva", type="password", placeholder="••••••••", key="reg_password")
+                crear = st.form_submit_button("Crear cuenta médica", use_container_width=True)
+            if crear:
+                ok, mensaje = registrar_usuario(nu, np, nm)
+                if ok:
+                    st.success("✅ " + mensaje)
+                else:
+                    st.warning("⚠️ " + mensaje)
 
-    st.markdown("""
-    <div style="text-align:center;color:#94A3B8;font-size:0.78em;margin-top:30px;">
-        MDPA 2026 Pro · Herramienta de apoyo diagnóstico · Uso exclusivo del profesional médico
+    st.markdown(f"""
+    <div style="text-align:center;color:#111827;font-size:0.78em;margin-top:30px;">
+        MDPA 2026 Pro · Herramienta de apoyo diagnóstico · Uso exclusivo del profesional médico<br>
+        {AUTOR_APP}
     </div>""", unsafe_allow_html=True)
 else:
     mostrar_interfaz()
