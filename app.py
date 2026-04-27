@@ -227,10 +227,15 @@ input, textarea, select { background:#FFFFFF !important; color:#111827 !importan
 # =========================================================
 # 2. BASE DE DATOS
 # =========================================================
+DB_PATH = "usuarios.db"
+
+def normalizar_usuario(usuario):
+    return (usuario or "").strip().lower()
+
 def crear_db():
-    """Crea/migra la base local de usuarios. Incluye matricula médica."""
-    conn = sqlite3.connect("usuarios.db", check_same_thread=False)
+    conn = sqlite3.connect(DB_PATH, check_same_thread=False)
     c = conn.cursor()
+
     c.execute("""
         CREATE TABLE IF NOT EXISTS usuarios (
             usuario TEXT PRIMARY KEY,
@@ -238,49 +243,83 @@ def crear_db():
             matricula TEXT DEFAULT ''
         )
     """)
+
     c.execute("PRAGMA table_info(usuarios)")
     columnas = [fila[1] for fila in c.fetchall()]
     if "matricula" not in columnas:
         c.execute("ALTER TABLE usuarios ADD COLUMN matricula TEXT DEFAULT ''")
-    c.execute("SELECT usuario FROM usuarios WHERE usuario=?", ("admin",))
-    if not c.fetchone():
-        pw = hashlib.sha256("12345".encode()).hexdigest()
-        c.execute("INSERT INTO usuarios (usuario, password, matricula) VALUES (?,?,?)", ("admin", pw, ""))
-    conn.commit(); conn.close()
+
+    pw_admin = hashlib.sha256("12345".encode("utf-8")).hexdigest()
+    c.execute("""
+        INSERT OR IGNORE INTO usuarios (usuario, password, matricula)
+        VALUES (?, ?, ?)
+    """, ("admin", pw_admin, ""))
+
+    conn.commit()
+    conn.close()
 
 def verificar_u(usuario, password):
-    usuario = (usuario or "").strip()
+    usuario = normalizar_usuario(usuario)
     password = (password or "").strip()
+
     if not usuario or not password:
         return None
-    pw = hashlib.sha256(password.encode()).hexdigest()
-    conn = sqlite3.connect("usuarios.db", check_same_thread=False)
+
+    pw = hashlib.sha256(password.encode("utf-8")).hexdigest()
+
+    conn = sqlite3.connect(DB_PATH, check_same_thread=False)
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
-    c.execute("SELECT usuario, matricula FROM usuarios WHERE usuario=? AND password=?", (usuario, pw))
-    r = c.fetchone(); conn.close()
+
+    c.execute("""
+        SELECT usuario, matricula
+        FROM usuarios
+        WHERE LOWER(TRIM(usuario)) = ?
+        AND password = ?
+    """, (usuario, pw))
+
+    r = c.fetchone()
+    conn.close()
+
     return dict(r) if r else None
 
 def registrar_usuario(usuario, password, matricula=""):
-    usuario = (usuario or "").strip()
+    usuario = normalizar_usuario(usuario)
     password = (password or "").strip()
     matricula = (matricula or "").strip()
+
     if not usuario or not password:
         return False, "Debe completar usuario y contraseña."
-    pw = hashlib.sha256(password.encode()).hexdigest()
-    try:
-        conn = sqlite3.connect("usuarios.db", check_same_thread=False)
-        c = conn.cursor()
-        c.execute("INSERT INTO usuarios (usuario, password, matricula) VALUES (?,?,?)", (usuario, pw, matricula))
-        conn.commit(); conn.close()
-        return True, "Cuenta creada. Podés iniciar sesión."
-    except sqlite3.IntegrityError:
-        return False, "El usuario ya existe."
 
+    pw = hashlib.sha256(password.encode("utf-8")).hexdigest()
+
+    try:
+        conn = sqlite3.connect(DB_PATH, check_same_thread=False)
+        c = conn.cursor()
+
+        c.execute("""
+            INSERT INTO usuarios (usuario, password, matricula)
+            VALUES (?, ?, ?)
+        """, (usuario, pw, matricula))
+
+        conn.commit()
+        conn.close()
+
+        return True, "Cuenta creada correctamente."
+
+    except sqlite3.IntegrityError:
+        return False, "El usuario ya existe. Ingrese con su contraseña."
+# =========================================================
+# 2. BASE DE DATOS
+# =========================================================
 crear_db()
-if "auth" not in st.session_state: st.session_state["auth"] = False
-if "user" not in st.session_state: st.session_state["user"] = None
-if "matricula" not in st.session_state: st.session_state["matricula"] = ""
+
+if "auth" not in st.session_state:
+    st.session_state["auth"] = False
+if "user" not in st.session_state:
+    st.session_state["user"] = None
+if "matricula" not in st.session_state:
+    st.session_state["matricula"] = ""
 
 # =========================================================
 # 3. GUÍA ARGENTINA HTA 2025 — UMBRALES
@@ -1481,12 +1520,16 @@ if not st.session_state["auth"]:
                 np = st.text_input("Contraseña nueva", type="password", placeholder="••••••••", key="reg_password")
                 crear = st.form_submit_button("Crear cuenta médica", use_container_width=True)
             if crear:
-                ok, mensaje = registrar_usuario(nu, np, nm)
-                if ok:
-                    st.success("✅ " + mensaje)
-                else:
-                    st.warning("⚠️ " + mensaje)
+    ok, mensaje = registrar_usuario(nu, np, nm)
 
+    if ok:
+        st.session_state["auth"] = True
+        st.session_state["user"] = normalizar_usuario(nu)
+        st.session_state["matricula"] = (nm or "").strip()
+        st.success("✅ Cuenta creada e ingreso correcto.")
+        st.rerun()
+    else:
+        st.warning("⚠️ " + mensaje)
     st.markdown(f"""
     <div style="text-align:center;color:#111827;font-size:0.78em;margin-top:30px;">
         MDPA 2026 Pro · Herramienta de apoyo diagnóstico · Uso exclusivo del profesional médico<br>
