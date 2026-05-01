@@ -222,6 +222,45 @@ input, textarea, select { background:#FFFFFF !important; color:#111827 !importan
 .stTabs [data-baseweb="tab"] p { color:#111827 !important; }
 .stTabs [aria-selected="true"] p { color:#FFFFFF !important; }
 .autor-app { margin-top:10px; font-size:0.82em; font-weight:700; color:#FFFFFF !important; }
+
+/* ─── CONTRASTE Y USABILIDAD EN SMARTPHONES ───────────── */
+.stApp, .main, .block-container { color: #111827 !important; }
+input, textarea, select,
+div[data-baseweb="select"] *,
+div[data-baseweb="input"] *,
+div[data-baseweb="textarea"] *,
+div[data-baseweb="checkbox"] *,
+div[data-baseweb="radio"] * { color: #111827 !important; }
+.stTextInput input, .stNumberInput input, .stDateInput input,
+.stSelectbox div[data-baseweb="select"],
+.stMultiSelect div[data-baseweb="select"], textarea {
+    background-color: #FFFFFF !important;
+    color: #111827 !important;
+    border: 1.5px solid #64748B !important;
+}
+.stCheckbox label, .stRadio label, .stSelectbox label,
+.stMultiSelect label, .stDateInput label, .stNumberInput label, .stTextInput label {
+    color: #111827 !important;
+    font-weight: 700 !important;
+}
+.stAlert, .stAlert * { color: #111827 !important; }
+.stDownloadButton > button, .stButton > button {
+    min-height: 44px !important;
+    white-space: normal !important;
+    line-height: 1.2 !important;
+}
+[data-testid="stDataFrame"] *, [data-testid="stTable"] * { color: #111827 !important; }
+@media (max-width: 768px) {
+    .block-container { padding-left: 0.75rem !important; padding-right: 0.75rem !important; padding-top: 1rem !important; }
+    .app-header { padding: 20px 18px !important; border-radius: 14px !important; }
+    .app-header h1 { font-size: 1.35em !important; line-height: 1.15 !important; }
+    .app-header p { font-size: 0.88em !important; color: #FFFFFF !important; }
+    .card, .diag-panel { padding: 16px 14px !important; border-radius: 12px !important; }
+    .sema-pill { font-size: 0.95em !important; padding: 6px 10px !important; margin: 3px 2px !important; }
+    .badge { display: block !important; width: 100% !important; text-align: center !important; white-space: normal !important; line-height: 1.25 !important; }
+    .stTabs [data-baseweb="tab"] { font-size: 0.85rem !important; padding-left: 8px !important; padding-right: 8px !important; }
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -364,6 +403,32 @@ def pill(val, tipo, campo):
             f'{c["label"]}</span>')
 
 
+
+def evaluar_control_tratamiento(datos):
+    """
+    Determina si un paciente medicado está controlado o no controlado.
+    Criterio operativo:
+    - Controlado: tratamiento activo y todas las mediciones están por debajo del umbral.
+    - Control ambulatorio adecuado con efecto de guardapolvo: consultorio elevado, MDPA/MAPA normal.
+    - No controlado: tratamiento activo y alguna medición ambulatoria supera umbral.
+    """
+    en_tratamiento = bool(datos.get("tratamiento", False))
+    if not en_tratamiento:
+        return "SIN TRATAMIENTO", "Paciente sin medicación antihipertensiva activa."
+
+    cons_h = datos.get('c_pas', 0) >= 140 or datos.get('c_pad', 0) >= 90
+    mdpa_h = datos.get('m_pas', 0) >= 135 or datos.get('m_pad', 0) >= 85
+    h24_h = datos.get('m24_pas', 0) >= 130 or datos.get('m24_pad', 0) >= 80
+    dia_h = datos.get('mdia_pas', 0) >= 135 or datos.get('mdia_pad', 0) >= 85
+    noc_h = datos.get('mnoc_pas', 0) >= 120 or datos.get('mnoc_pad', 0) >= 70
+    amb_h = mdpa_h or h24_h or dia_h or noc_h
+
+    if not cons_h and not amb_h:
+        return "CONTROLADO POR MEDICACIÓN", "Paciente tratado con cifras de consultorio, MDPA y MAPA dentro de objetivos."
+    if cons_h and not amb_h:
+        return "CONTROL AMBULATORIO ADECUADO CON EFECTO DE GUARDAPOLVO", "Paciente tratado con cifras ambulatorias controladas y presión de consultorio elevada."
+    return "NO CONTROLADO POR MEDICACIÓN", "Paciente tratado con persistencia de cifras elevadas en mediciones ambulatorias y/o consultorio."
+
 # =========================================================
 # 4. DIAGNÓSTICO CLÍNICO
 # =========================================================
@@ -376,6 +441,7 @@ def diagnostico(datos):
 
     cons_h = cp >= 140 or cd >= 90
     amb_h  = mp >= 135 or md >= 85 or m24p >= 130 or m24d >= 80
+    estado_tratamiento, texto_estado_tratamiento = evaluar_control_tratamiento(datos)
 
     if cons_h and amb_h:
         diag,badge,col_pdf,riesgo = "Hipertensión Arterial Sostenida","badge-sostenida",(155,20,30),"ALTO"
@@ -500,11 +566,12 @@ def diagnostico(datos):
     recs.append(f"Meta terapéutica individualizada: {meta_pa} — Estratificar riesgo CV global: glucemia, lípidos, TFGe, microalbuminuria, ECG y fondo de ojo (SAHA 2025).")
 
     fenotipo_mapa = clasificar_fenotipo_mapa(m24p, m24d, diap, diad, nocp, nocd)
-    fenotipo_mapa_texto = texto_fenotipo_mapa(fenotipo_mapa, datos)
+    fenotipo_mapa_texto = texto_fenotipo_mapa(fenotipo_mapa, datos, estado_tratamiento, texto_estado_tratamiento)
 
     return {
         "diag":diag,"badge":badge,"col_pdf":col_pdf,"riesgo":riesgo,"desc_diag":desc,
         "fenotipo_mapa": fenotipo_mapa, "fenotipo_mapa_texto": fenotipo_mapa_texto,
+        "estado_tratamiento": estado_tratamiento, "texto_estado_tratamiento": texto_estado_tratamiento,
         "patron":patron,"pat_r":pat_r,"col_pat":col_pat,"pat_desc":pat_desc[patron],"descenso":descenso,
         "pp_cons":pp_cons,"pp_mdpa":pp_mdpa,"pp_24h":pp_24h,"recomendaciones":recs,
         "meta_pa":meta_pa,"n_frc":n_frc,"tiene_dob":tiene_dob,"tiene_ece":tiene_ece,
@@ -568,16 +635,20 @@ def clasificar_fenotipo_mapa(m24_pas, m24_pad, mdia_pas, mdia_pad, mnoc_pas, mno
     return None
 
 
-def texto_fenotipo_mapa(fenotipo, datos):
-    """Texto seguro y no ambiguo para pantalla/PDF."""
+def texto_fenotipo_mapa(fenotipo, datos, estado_tratamiento="SIN TRATAMIENTO", texto_estado_tratamiento=""):
+    """Texto seguro y no ambiguo para pantalla/PDF, incluyendo control terapéutico si está medicado."""
     promedios = (
         f"Promedios MAPA: 24 h {datos['m24_pas']}/{datos['m24_pad']} mmHg; "
         f"diurno {datos['mdia_pas']}/{datos['mdia_pad']} mmHg; "
         f"nocturno {datos['mnoc_pas']}/{datos['mnoc_pad']} mmHg."
     )
+    if bool(datos.get("tratamiento", False)):
+        estado = f"Estado terapéutico: {estado_tratamiento}. {texto_estado_tratamiento}"
+    else:
+        estado = "Estado terapéutico: sin tratamiento antihipertensivo activo."
     if fenotipo:
-        return f"Fenotipo MAPA: {fenotipo}. {promedios}"
-    return promedios
+        return f"Fenotipo MAPA: {fenotipo}. {estado} {promedios}"
+    return f"{estado} {promedios}"
 
 
 # =========================================================
@@ -804,6 +875,11 @@ def generar_pdf(datos, res):
     pdf.set_font("Arial","",9)
     pdf.multi_cell(0,6,
         "Umbrales MAPA usados por defecto: 24 h >=130/80 mmHg; diurno >=135/85 mmHg; nocturno >=120/70 mmHg.")
+    if d.get("tratamiento"):
+        pdf.ln(2)
+        pdf.set_fill_color(*AZUL_CLR); pdf.set_text_color(0,0,0); pdf.set_font("Arial","B",9)
+        pdf.multi_cell(0,8, f"Estado terapeutico: {r.get('estado_tratamiento', '')}. {r.get('texto_estado_tratamiento', '')}", border=1, fill=True)
+        pdf.set_text_color(0,0,0)
     pdf.ln(2)
     if r.get("fenotipo_mapa"):
         pdf.set_fill_color(*ROJO_PDF); pdf.set_text_color(*tc(ROJO_PDF)); pdf.set_font("Arial","B",11)
@@ -1075,6 +1151,8 @@ def preparar_registro_gs(datos, res):
         "autor_app": AUTOR_APP,
         "tratamiento_antihipertensivo": binario(datos.get("tratamiento", False)),
         "tratamiento_antihipertensivo_txt": si_no(datos.get("tratamiento", False)),
+        "estado_tratamiento": res.get("estado_tratamiento", ""),
+        "texto_estado_tratamiento": res.get("texto_estado_tratamiento", ""),
 
         "consultorio_pas": datos.get("c_pas"),
         "consultorio_pad": datos.get("c_pad"),
@@ -1208,6 +1286,7 @@ def leer_historial_usuario():
     columnas_preferidas = [
         "id", "usuario_app", "timestamp_guardado", "nombre", "fecha", "medico",
         "matricula_medico", "tratamiento_antihipertensivo",
+        "estado_tratamiento", "texto_estado_tratamiento",
         "consultorio_pas", "consultorio_pad",
         "mdpa_pas", "mdpa_pad",
         "mapa_24h_pas", "mapa_24h_pad",
@@ -1241,6 +1320,7 @@ def crear_excel_individual(datos, res):
         {"Campo": "Matrícula", "Valor": datos.get("matricula", "")},
         {"Campo": "Diagnóstico", "Valor": res.get("diag", "")},
         {"Campo": "Fenotipo MAPA", "Valor": res.get("fenotipo_mapa") or ""},
+        {"Campo": "Estado terapéutico", "Valor": res.get("estado_tratamiento", "")},
         {"Campo": "Riesgo CV", "Valor": res.get("riesgo", "")},
         {"Campo": "Patrón circadiano", "Valor": res.get("patron", "")},
         {"Campo": "Descenso nocturno (%)", "Valor": round(float(res.get("descenso", 0)), 1)},
@@ -1277,6 +1357,7 @@ def crear_excel_acumulado_usuario():
         df.to_excel(writer, index=False, sheet_name="Pacientes")
 
         diccionario = pd.DataFrame([
+            {"Variable": "estado_tratamiento", "Descripción": "En pacientes medicados: controlado, no controlado o control ambulatorio adecuado con efecto de guardapolvo"},
             {"Variable": "consultorio_pas / consultorio_pad", "Descripción": "Presión arterial de consultorio"},
             {"Variable": "mdpa_pas / mdpa_pad", "Descripción": "Presión arterial domiciliaria MDPA"},
             {"Variable": "mapa_24h_pas / mapa_24h_pad", "Descripción": "Promedio MAPA 24 horas"},
