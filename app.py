@@ -261,6 +261,105 @@ div[data-baseweb="radio"] * { color: #111827 !important; }
     .stTabs [data-baseweb="tab"] { font-size: 0.85rem !important; padding-left: 8px !important; padding-right: 8px !important; }
 }
 
+
+
+/* ================= CONTRASTE GLOBAL CORREGIDO ================= */
+html, body, .stApp, .stMarkdown, p, span, div, label {
+    color: #111827 !important;
+}
+.stApp { background-color: #F3F6FA !important; }
+.card, .diag-panel, .stAlert, [data-testid="stMetric"],
+[data-testid="stExpander"], .stTabs, .stForm {
+    background-color: #FFFFFF !important;
+    color: #111827 !important;
+}
+.card *, .diag-panel *, .stAlert *, [data-testid="stMetric"] * {
+    color: #111827 !important;
+}
+input, textarea, select,
+.stTextInput input,
+.stNumberInput input,
+.stDateInput input,
+.stSelectbox div,
+.stMultiSelect div {
+    background-color: #FFFFFF !important;
+    color: #111827 !important;
+    border-color: #94A3B8 !important;
+}
+.stTextInput label,
+.stNumberInput label,
+.stDateInput label,
+.stSelectbox label,
+.stMultiSelect label,
+.stCheckbox label,
+.stRadio label {
+    color: #111827 !important;
+    font-weight: 700 !important;
+}
+.stCheckbox span, .stRadio span { color: #111827 !important; }
+section[data-testid="stSidebar"] {
+    background: linear-gradient(180deg, #0B4F8A 0%, #082D52 100%) !important;
+}
+section[data-testid="stSidebar"] *,
+section[data-testid="stSidebar"] label,
+section[data-testid="stSidebar"] p,
+section[data-testid="stSidebar"] span {
+    color: #FFFFFF !important;
+}
+.stButton > button,
+.stDownloadButton > button {
+    background: #0B4F8A !important;
+    color: #FFFFFF !important;
+    border: 2px solid #0B4F8A !important;
+    font-weight: 800 !important;
+}
+.stTabs [data-baseweb="tab"] {
+    background-color: #E5E7EB !important;
+    color: #111827 !important;
+}
+.stTabs [data-baseweb="tab"] p {
+    color: #111827 !important;
+    font-weight: 800 !important;
+}
+.stTabs [aria-selected="true"] { background-color: #0B4F8A !important; }
+.stTabs [aria-selected="true"] p { color: #FFFFFF !important; }
+.sema-pill, .sema-pill *, .chip, .chip *, .badge, .badge * {
+    color: #000000 !important;
+}
+.app-header *, .seccion-titulo, .seccion-titulo * { color: #FFFFFF !important; }
+.stMarkdown h1, .stMarkdown h2, .stMarkdown h3 { color: #0B4F8A !important; }
+[data-testid="stDataFrame"] *, [data-testid="stTable"] * {
+    color: #111827 !important;
+    background-color: #FFFFFF !important;
+}
+/* Menús desplegables BaseWeb */
+ul[role="listbox"], ul[role="listbox"] li, div[role="listbox"], div[role="option"] {
+    background-color: #FFFFFF !important;
+    color: #111827 !important;
+}
+/* Columnas y contenedores Streamlit en móvil */
+@media (max-width: 768px) {
+    .block-container { padding-left: 0.7rem !important; padding-right: 0.7rem !important; }
+    .card, .diag-panel {
+        background-color: #FFFFFF !important;
+        color: #111827 !important;
+        padding: 16px 14px !important;
+    }
+    .card *, .diag-panel * { color: #111827 !important; }
+    input, textarea, select {
+        color: #111827 !important;
+        background-color: #FFFFFF !important;
+    }
+    .stButton > button, .stDownloadButton > button {
+        color: #FFFFFF !important;
+        background-color: #0B4F8A !important;
+        width: 100% !important;
+        min-height: 44px !important;
+    }
+    .app-header { padding: 22px 18px !important; }
+    .app-header h1 { font-size: 1.45em !important; }
+}
+
 </style>
 """, unsafe_allow_html=True)
 
