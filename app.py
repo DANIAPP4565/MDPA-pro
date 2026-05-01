@@ -1123,51 +1123,112 @@ def preparar_registro_gs(datos, res):
     }
 
 
-def normalizar_dataframe_excel(df_act, registro_excel):
-    """Ordena columnas nuevas y conserva historial previo sin perder columnas."""
-    columnas_nuevas = list(registro_excel.keys())
-    df_nuevo = pd.DataFrame([registro_excel])
-    if df_act is None or df_act.empty:
-        return df_nuevo[columnas_nuevas]
-    df_act = df_act.copy()
-    df_act = df_act.drop(columns=["factores_riesgo", "dano_organo", "enf_establecida"], errors="ignore")
-    for col in columnas_nuevas:
-        if col not in df_act.columns:
-            df_act[col] = ""
-    df_fin = pd.concat([df_act, df_nuevo], ignore_index=True, sort=False)
-    columnas_extra = [c for c in df_fin.columns if c not in columnas_nuevas]
-    return df_fin[columnas_nuevas + columnas_extra]
 
-def leer_historial_excel():
-    """Lee el archivo Excel local de historial si existe."""
-    if not os.path.exists(EXCEL_PATH):
-        return pd.DataFrame()
-    try:
-        return pd.read_excel(EXCEL_PATH, sheet_name="Historial")
-    except Exception:
-        return pd.DataFrame()
+def _columnas_excel_base():
+    """Columnas definitivas del Excel acumulado: una fila por paciente."""
+    return list(preparar_registro_gs({}, {}).keys())
 
-def guardar_excel_local(datos, res):
-    """Guarda el registro actual en un archivo Excel local acumulativo."""
-    try:
-        registro_excel = preparar_registro_gs(datos, res)
-        df_act = leer_historial_excel()
-        df_fin = normalizar_dataframe_excel(df_act, registro_excel)
-        columnas_binarias = [
-            c for c in df_fin.columns
-            if c.startswith(("frc_", "dob_", "ece_"))
-            or c in ["tratamiento_antihipertensivo", "tiene_dano_organo_blanco", "tiene_enfermedad_cv_renal_establecida"]
-        ]
-        for col in columnas_binarias:
-            if not col.endswith("_txt") and not col.startswith("resumen_"):
-                df_fin[col] = pd.to_numeric(df_fin[col], errors="coerce").fillna(0).astype(int)
-        df_fin = df_fin.fillna("")
-        with pd.ExcelWriter(EXCEL_PATH, engine="openpyxl") as writer:
-            df_fin.to_excel(writer, index=False, sheet_name="Historial")
-        return True, f"Guardado correctamente en Excel local: {EXCEL_PATH}"
-    except Exception as e:
-        st.session_state["excel_error"] = str(e)
-        return False, f"No se pudo guardar en Excel: {e}"
+
+def asegurar_tabla_registros():
+    """
+    Crea una tabla SQLite acumulativa y agrega columnas nuevas si el código evoluciona.
+    Esto permite guardar todos los pacientes del mismo usuario en la misma base.
+    """
+    ejemplo = preparar_registro_gs({}, {})
+    ejemplo["usuario_app"] = ""
+    conn = sqlite3.connect(DB_PATH, check_same_thread=False)
+    c = conn.cursor()
+
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS registros_pacientes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT
+        )
+    """)
+
+    c.execute("PRAGMA table_info(registros_pacientes)")
+    existentes = {fila[1] for fila in c.fetchall()}
+
+    for col, val in ejemplo.items():
+        if col not in existentes:
+            if isinstance(val, int):
+                tipo = "INTEGER"
+            elif isinstance(val, float):
+                tipo = "REAL"
+            else:
+                tipo = "TEXT"
+            c.execute(f'ALTER TABLE registros_pacientes ADD COLUMN "{col}" {tipo}')
+
+    conn.commit()
+    conn.close()
+
+
+def guardar_paciente_en_db(datos, res):
+    """
+    Guarda el paciente actual en SQLite.
+    Cada guardado suma una nueva fila al historial del usuario autenticado.
+    """
+    asegurar_tabla_registros()
+    registro = preparar_registro_gs(datos, res)
+    registro["usuario_app"] = st.session_state.get("user", "sin_usuario")
+
+    conn = sqlite3.connect(DB_PATH, check_same_thread=False)
+    columnas = list(registro.keys())
+    placeholders = ",".join(["?"] * len(columnas))
+    columnas_sql = ",".join([f'"{c}"' for c in columnas])
+    valores = [registro[c] for c in columnas]
+
+    conn.execute(
+        f'INSERT INTO registros_pacientes ({columnas_sql}) VALUES ({placeholders})',
+        valores
+    )
+    conn.commit()
+    conn.close()
+
+
+def leer_historial_usuario():
+    """
+    Lee todos los pacientes acumulados del usuario actual.
+    Devuelve un DataFrame listo para mostrar y exportar.
+    """
+    asegurar_tabla_registros()
+    usuario = st.session_state.get("user", "sin_usuario")
+
+    conn = sqlite3.connect(DB_PATH, check_same_thread=False)
+    df = pd.read_sql_query(
+        "SELECT * FROM registros_pacientes WHERE usuario_app = ? ORDER BY id ASC",
+        conn,
+        params=(usuario,)
+    )
+    conn.close()
+
+    if df.empty:
+        return df
+
+    # El id queda como control interno, pero también puede servir para trazabilidad.
+    columnas_preferidas = [
+        "id", "usuario_app", "timestamp_guardado", "nombre", "fecha", "medico",
+        "matricula_medico", "tratamiento_antihipertensivo",
+        "consultorio_pas", "consultorio_pad",
+        "mdpa_pas", "mdpa_pad",
+        "mapa_24h_pas", "mapa_24h_pad",
+        "mapa_diurno_pas", "mapa_diurno_pad",
+        "mapa_nocturno_pas", "mapa_nocturno_pad",
+        "diagnostico", "fenotipo_mapa", "riesgo_cv", "patron_circadiano",
+        "descenso_nocturno_pct", "presion_pulso_24h", "meta_pa",
+        "n_factores_riesgo", "tiene_dano_organo_blanco",
+        "tiene_enfermedad_cv_renal_establecida",
+        "frc_diabetes_mellitus", "frc_tabaquismo_activo", "frc_dislipemia",
+        "frc_obesidad", "frc_antecedentes_familiares_cv", "frc_edad_riesgo",
+        "dob_hvi", "dob_microalbuminuria", "dob_retinopatia_hipertensiva",
+        "dob_erc_estadio_3",
+        "ece_erc_estadio_4_o_mayor", "ece_diabetes_con_dob", "ece_ecv_establecida",
+        "resumen_factores_riesgo", "resumen_dano_organo_blanco",
+        "resumen_enfermedad_cv_renal_establecida",
+    ]
+    columnas_preferidas = [c for c in columnas_preferidas if c in df.columns]
+    columnas_extra = [c for c in df.columns if c not in columnas_preferidas]
+    return df[columnas_preferidas + columnas_extra]
+
 
 def crear_excel_individual(datos, res):
     """Crea un archivo Excel descargable para el paciente actual."""
@@ -1203,14 +1264,34 @@ def crear_excel_individual(datos, res):
     nombre_archivo = f"HTA_{nombre_seguro}_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx"
     return output, nombre_archivo
 
-def crear_excel_historial_descarga():
-    """Devuelve el historial completo como Excel descargable."""
-    df = leer_historial_excel()
+
+def crear_excel_acumulado_usuario():
+    """
+    Exporta el historial completo del usuario a Excel.
+    Variables por columnas y pacientes por filas.
+    """
+    df = leer_historial_usuario()
     output = io.BytesIO()
+
     with pd.ExcelWriter(output, engine="openpyxl") as writer:
-        df.to_excel(writer, index=False, sheet_name="Historial")
+        df.to_excel(writer, index=False, sheet_name="Pacientes")
+
+        diccionario = pd.DataFrame([
+            {"Variable": "consultorio_pas / consultorio_pad", "Descripción": "Presión arterial de consultorio"},
+            {"Variable": "mdpa_pas / mdpa_pad", "Descripción": "Presión arterial domiciliaria MDPA"},
+            {"Variable": "mapa_24h_pas / mapa_24h_pad", "Descripción": "Promedio MAPA 24 horas"},
+            {"Variable": "mapa_diurno_pas / mapa_diurno_pad", "Descripción": "Promedio MAPA diurno"},
+            {"Variable": "mapa_nocturno_pas / mapa_nocturno_pad", "Descripción": "Promedio MAPA nocturno"},
+            {"Variable": "frc_*", "Descripción": "Factores de riesgo cardiovascular dicotómicos: 1 = sí, 0 = no"},
+            {"Variable": "dob_*", "Descripción": "Daño de órgano blanco dicotómico: 1 = sí, 0 = no"},
+            {"Variable": "ece_*", "Descripción": "Enfermedad cardiovascular/renal establecida: 1 = sí, 0 = no"},
+        ])
+        diccionario.to_excel(writer, index=False, sheet_name="Diccionario")
+
     output.seek(0)
-    return output
+    usuario = st.session_state.get("user", "usuario")
+    nombre = f"MDPA_2026_base_{usuario}_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx"
+    return output, nombre, len(df)
 
 
 CAMPOS_EVALUACION_DEFAULTS = {
@@ -1456,11 +1537,11 @@ def mostrar_interfaz():
                 if not nombre:
                     st.warning("⚠️ Ingresá el nombre del paciente antes de guardar.")
                 else:
-                    ok_excel, msg_excel = guardar_excel_local(datos_actuales, res)
-                    if ok_excel:
-                        st.success("✅ " + msg_excel)
-                    else:
-                        st.error("⚠️ " + msg_excel)
+                    try:
+                        guardar_paciente_en_db(datos_actuales, res)
+                        st.success("✅ Paciente guardado correctamente en la base acumulada del usuario.")
+                    except Exception as e:
+                        st.error(f"⚠️ No se pudo guardar el paciente en la base acumulada: {e}")
 
                     pdf_bytes = generar_pdf(datos_actuales, res)
                     excel_bytes, excel_name = crear_excel_individual(datos_actuales, res)
@@ -1481,27 +1562,27 @@ def mostrar_interfaz():
                     st.balloons()
 
         with col_b2:
-            historial_df = leer_historial_excel()
+            historial_df = leer_historial_usuario()
             if not historial_df.empty:
                 st.download_button(
                     label="📚 Descargar Historial Excel",
-                    data=crear_excel_historial_descarga(),
-                    file_name=f"Historial_MDPA_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx",
+                    data=crear_excel_acumulado_usuario()[0],
+                    file_name=crear_excel_acumulado_usuario()[1],
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     use_container_width=True)
 
     with tab2:
         st.markdown("### 📚 Historial de Pacientes")
-        df = leer_historial_excel()
+        df = leer_historial_usuario()
         if df.empty:
-            st.info("📭 Sin datos guardados todavía. Cuando guardes una evaluación, se creará el archivo Excel local.")
+            st.info("📭 Sin datos guardados todavía. Cuando guardes una evaluación, se sumará a la base acumulada del usuario.")
         else:
-            st.caption(f"Archivo local: {EXCEL_PATH}")
+            st.caption("Base acumulada por usuario en SQLite. Descargar en Excel cuando sea necesario.")
             st.dataframe(df, use_container_width=True, hide_index=True)
             st.download_button(
                 label="⬇ Descargar historial completo en Excel",
-                data=crear_excel_historial_descarga(),
-                file_name=f"Historial_MDPA_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx",
+                data=crear_excel_acumulado_usuario()[0],
+                file_name=crear_excel_acumulado_usuario()[1],
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 use_container_width=True)
 
