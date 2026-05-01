@@ -17,124 +17,227 @@ AUTOR_APP = "Ricardo Daniel Olano, Especialista en Cardiologia y en Hipertension
 # Exportación local a Excel.
 EXCEL_PATH = "historial_pacientes_mdpa.xlsx"
 
-# ── CSS TEMÁTICA SALUD ────────────────────────────────────
+# ── CSS PREMIUM MEDICAL ──────────────────────────────────
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&family=Playfair+Display:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-    --blanco:      #FFFFFF;
-    --gris-fondo:  #F0F4F8;
-    --gris-borde:  #CBD5E1;
-    --azul-oscuro: #0B4F8A;
-    --azul-medio:  #1976C8;
-    --azul-claro:  #D6EAF8;
-    --celeste:     #EBF5FF;
-    --verde:       #1B7E4A;
-    --verde-bg:    #D4EDDA;
-    --amarillo:    #856404;
-    --amarillo-bg: #FFF3CD;
-    --naranja:     #7D3C00;
-    --naranja-bg:  #FFE0C2;
-    --rojo:        #7B1217;
-    --rojo-bg:     #F8D7DA;
-    --texto:       #1A2535;
-    --texto-suave: #4A5568;
+    /* Fondo y superficies */
+    --bg-app:      #EAF0F8;
+    --bg-card:     #FFFFFF;
+    --bg-surface:  #F4F7FC;
+
+    /* Paleta primaria — navy cardíaco */
+    --navy-900:    #071830;
+    --navy-800:    #0A2240;
+    --navy-700:    #0D3060;
+    --navy-600:    #0F3F7E;
+    --navy-500:    #1451A0;
+    --navy-400:    #2563C0;
+
+    /* Acento — teal quirúrgico */
+    --teal-700:    #0B6E8A;
+    --teal-600:    #0E87A8;
+    --teal-500:    #12A0C4;
+    --teal-100:    #D4F0F8;
+
+    /* Semáforo */
+    --verde:       #166534;
+    --verde-bg:    #DCFCE7;
+    --verde-brd:   #15803D;
+    --amari:       #854D0E;
+    --amari-bg:    #FEF9C3;
+    --amari-brd:   #A16207;
+    --naran:       #7C2D12;
+    --naran-bg:    #FFEDD5;
+    --naran-brd:   #C2410C;
+    --rojo:        #7F1D1D;
+    --rojo-bg:     #FEE2E2;
+    --rojo-brd:    #B91C1C;
+
+    /* Texto */
+    --txt-primary: #0C1A2E;
+    --txt-body:    #1E293B;
+    --txt-muted:   #475569;
+    --txt-light:   #94A3B8;
+
+    /* Bordes */
+    --border:      #CBD5E1;
+    --border-soft: #E2E8F0;
+
+    /* Colores de tarjeta por método */
+    --c-cons:  #1451A0;
+    --c-mdpa:  #0B7E6A;
+    --c-mapa:  #6D28D9;
+    --c-diu:   #B45309;
+    --c-noc:   #374151;
+
+    /* Sombras */
+    --shadow-sm: 0 1px 4px rgba(7,24,48,0.08);
+    --shadow-md: 0 4px 16px rgba(7,24,48,0.10);
+    --shadow-lg: 0 8px 32px rgba(7,24,48,0.13);
+    --shadow-xl: 0 16px 48px rgba(7,24,48,0.16);
 }
 
+/* ─── BASE ─────────────────────────────────────────────── */
 html, body, [class*="css"] {
-    font-family: 'Nunito', sans-serif !important;
-    background-color: var(--gris-fondo) !important;
-    color: var(--texto) !important;
+    font-family: 'Outfit', sans-serif !important;
+    background-color: var(--bg-app) !important;
+    color: var(--txt-body) !important;
 }
-
-.stApp { background-color: var(--gris-fondo) !important; }
+.stApp { background-color: var(--bg-app) !important; }
 
 /* ─── SIDEBAR ──────────────────────────────────────────── */
 section[data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #0B4F8A 0%, #0d3d6b 60%, #082d52 100%) !important;
-    border-right: none !important;
+    background:
+        radial-gradient(ellipse at 10% 20%, rgba(14,135,168,0.18) 0%, transparent 55%),
+        radial-gradient(ellipse at 90% 80%, rgba(20,81,160,0.22) 0%, transparent 55%),
+        linear-gradient(170deg, var(--navy-800) 0%, var(--navy-900) 100%) !important;
+    border-right: 1px solid rgba(255,255,255,0.06) !important;
+    box-shadow: 2px 0 24px rgba(7,24,48,0.22) !important;
 }
 section[data-testid="stSidebar"] .stMarkdown,
 section[data-testid="stSidebar"] p,
 section[data-testid="stSidebar"] span,
 section[data-testid="stSidebar"] div,
 section[data-testid="stSidebar"] label {
-    color: #DBEAFE !important;
+    color: #B8D4F0 !important;
 }
 section[data-testid="stSidebar"] h2,
-section[data-testid="stSidebar"] h3 { color: #FFFFFF !important; }
+section[data-testid="stSidebar"] h3,
+section[data-testid="stSidebar"] strong,
+section[data-testid="stSidebar"] b { color: #FFFFFF !important; }
 
 /* ─── HEADER PRINCIPAL ─────────────────────────────────── */
 .app-header {
-    background: linear-gradient(135deg, #0B4F8A 0%, #1565C0 60%, #1976C8 100%);
-    border-radius: 18px;
-    padding: 32px 40px;
-    margin-bottom: 28px;
-    box-shadow: 0 6px 24px rgba(11,79,138,0.22);
+    background:
+        radial-gradient(ellipse at 0% 50%, rgba(14,135,168,0.30) 0%, transparent 50%),
+        radial-gradient(ellipse at 100% 0%, rgba(20,81,160,0.35) 0%, transparent 50%),
+        linear-gradient(135deg, var(--navy-800) 0%, var(--navy-700) 50%, var(--navy-600) 100%);
+    border-radius: 20px;
+    padding: 36px 48px;
+    margin-bottom: 32px;
+    box-shadow: var(--shadow-xl), 0 0 0 1px rgba(255,255,255,0.07);
     position: relative;
     overflow: hidden;
 }
 .app-header::before {
-    content: "❤";
+    content: "";
     position: absolute;
-    right: 40px; top: 50%;
+    inset: 0;
+    background:
+        repeating-linear-gradient(
+            90deg,
+            rgba(255,255,255,0.015) 0px,
+            rgba(255,255,255,0.015) 1px,
+            transparent 1px,
+            transparent 60px
+        ),
+        repeating-linear-gradient(
+            0deg,
+            rgba(255,255,255,0.015) 0px,
+            rgba(255,255,255,0.015) 1px,
+            transparent 1px,
+            transparent 60px
+        );
+    pointer-events: none;
+}
+.app-header::after {
+    content: "♡";
+    position: absolute;
+    right: 44px; top: 50%;
     transform: translateY(-50%);
-    font-size: 7em;
-    opacity: 0.08;
+    font-size: 9em;
+    line-height: 1;
+    opacity: 0.05;
+    color: #FFFFFF;
+    font-family: serif;
+    letter-spacing: -8px;
 }
 .app-header h1 {
-    font-family: 'Playfair Display', serif !important;
-    color: #FFFFFF !important; font-size: 2em !important;
-    margin: 0 !important; letter-spacing: -0.3px;
+    font-family: 'DM Serif Display', serif !important;
+    color: #FFFFFF !important;
+    font-size: 2.1em !important;
+    font-weight: 400 !important;
+    margin: 0 !important;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.2);
 }
-.app-header p { color: #B3D4F5 !important; margin: 6px 0 0 0 !important; font-size: 0.95em; }
+.app-header p {
+    color: rgba(180,210,245,0.9) !important;
+    margin: 8px 0 0 0 !important;
+    font-size: 0.92em;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+}
+.app-header p strong { color: #FFFFFF !important; font-weight: 600; }
 
 /* ─── TARJETAS DE MEDICIÓN ─────────────────────────────── */
 .card {
-    background: #FFFFFF;
-    border-radius: 14px;
-    padding: 22px 24px;
-    margin-bottom: 12px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-    border-top: 4px solid;
+    background: var(--bg-card);
+    border-radius: 16px;
+    padding: 24px 26px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-soft);
+    border-top: none;
+    border-left: 5px solid;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+    position: relative;
+    overflow: hidden;
 }
-.card-consultorio { border-color: #1976C8; }
-.card-mdpa        { border-color: #17A589; }
-.card-mapa        { border-color: #7B68EE; }
-.card-diurno      { border-color: #F39C12; }
-.card-nocturno    { border-color: #5D6D7E; }
+.card::after {
+    content: "";
+    position: absolute;
+    top: 0; right: 0;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.6) 0%, transparent 70%);
+    transform: translate(40px, -40px);
+    pointer-events: none;
+}
+.card-consultorio { border-left-color: var(--c-cons); }
+.card-mdpa        { border-left-color: var(--c-mdpa); }
+.card-mapa        { border-left-color: var(--c-mapa); }
+.card-diurno      { border-left-color: var(--c-diu);  }
+.card-nocturno    { border-left-color: var(--c-noc);  }
 
 .card-title {
-    font-weight: 800; font-size: 0.92em;
-    letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 12px;
+    font-weight: 700; font-size: 0.80em;
+    letter-spacing: 0.09em; text-transform: uppercase; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 6px;
 }
-.ct-cons { color: #1976C8; }
-.ct-mdpa { color: #17A589; }
-.ct-mapa { color: #7B68EE; }
-.ct-diu  { color: #F39C12; }
-.ct-noc  { color: #5D6D7E; }
+.ct-cons { color: var(--c-cons); }
+.ct-mdpa { color: var(--c-mdpa); }
+.ct-mapa { color: var(--c-mapa); }
+.ct-diu  { color: var(--c-diu);  }
+.ct-noc  { color: var(--c-noc);  }
 
 /* ─── SEMÁFOROS ────────────────────────────────────────── */
 .sema-pill {
-    display: inline-block;
-    padding: 4px 14px;
-    border-radius: 20px;
-    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 14px 5px 12px;
+    border-radius: 100px;
+    font-weight: 700;
     font-size: 1.05em;
-    margin: 2px 4px;
-    letter-spacing: 0.02em;
-    border: 2px solid transparent;
+    margin: 3px 4px;
+    letter-spacing: 0.01em;
+    border: 1.5px solid transparent;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.10);
 }
-.sema-verde    { background: var(--verde-bg);    color: var(--verde);    border-color: #1B7E4A; }
-.sema-amarillo { background: var(--amarillo-bg); color: var(--amarillo); border-color: #856404; }
-.sema-naranja  { background: var(--naranja-bg);  color: var(--naranja);  border-color: #7D3C00; }
-.sema-rojo     { background: var(--rojo-bg);     color: var(--rojo);     border-color: #7B1217; }
+.sema-verde    { background: var(--verde-bg);  color: var(--verde) !important; border-color: var(--verde-brd);  }
+.sema-amarillo { background: var(--amari-bg);  color: var(--amari) !important; border-color: var(--amari-brd);  }
+.sema-naranja  { background: var(--naran-bg);  color: var(--naran) !important; border-color: var(--naran-brd);  }
+.sema-rojo     { background: var(--rojo-bg);   color: var(--rojo)  !important; border-color: var(--rojo-brd);   }
 
 .sema-label {
-    font-size: 0.72em; font-weight: 700;
-    letter-spacing: 0.06em; text-transform: uppercase;
-    margin-right: 4px; opacity: 0.75;
+    font-size: 0.68em; font-weight: 700;
+    letter-spacing: 0.10em; text-transform: uppercase;
+    margin-right: 2px; color: var(--txt-muted) !important; opacity: 0.85;
 }
 
 section[data-testid="stSidebar"] .sidebar-sema,
@@ -148,216 +251,206 @@ section[data-testid="stSidebar"] .sidebar-sema b {
 
 /* ─── PANEL DIAGNÓSTICO ────────────────────────────────── */
 .diag-panel {
-    background: #FFFFFF;
-    border-radius: 14px; padding: 28px 32px; margin-top: 22px;
-    box-shadow: 0 2px 16px rgba(0,0,0,0.08);
-    border-left: 6px solid #1976C8;
+    background: var(--bg-card);
+    border-radius: 18px; padding: 32px 36px; margin-top: 24px;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-soft);
+    border-left: 6px solid var(--navy-600);
+    position: relative;
+    overflow: hidden;
 }
-.diag-panel h3 { color: #0B4F8A !important; margin-top:0 !important; }
+.diag-panel::before {
+    content: "";
+    position: absolute;
+    top: 0; right: 0;
+    width: 240px; height: 240px;
+    background: radial-gradient(circle, rgba(14,135,168,0.05) 0%, transparent 70%);
+    transform: translate(60px, -60px);
+    pointer-events: none;
+}
+.diag-panel h3 { color: var(--navy-700) !important; margin-top:0 !important; font-family: 'DM Serif Display', serif !important; font-weight:400 !important; }
+.diag-panel h4 { color: var(--navy-600) !important; }
 
 .badge {
-    display: inline-block; padding: 8px 22px; border-radius: 24px;
-    font-weight: 800; font-size: 1em; letter-spacing: 0.03em;
+    display: inline-block; padding: 9px 26px; border-radius: 100px;
+    font-weight: 700; font-size: 0.98em; letter-spacing: 0.04em;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
 }
-.badge-normal    { background:#D4EDDA; color:#1B7E4A; border:2px solid #1B7E4A; }
-.badge-bata      { background:#D6EAF8; color:#1565C0; border:2px solid #1565C0; }
-.badge-enmasc    { background:#FFE0C2; color:#7D3C00; border:2px solid #E67E22; }
-.badge-sostenida { background:#F8D7DA; color:#7B1217; border:2px solid #C0392B; }
+.badge-normal    { background:#DCFCE7; color:#14532D; border:1.5px solid #16A34A; }
+.badge-bata      { background:#DBEAFE; color:#1E3A6E; border:1.5px solid #2563EB; }
+.badge-enmasc    { background:#FFEDD5; color:#7C2D12; border:1.5px solid #C2410C; }
+.badge-sostenida { background:#FEE2E2; color:#7F1D1D; border:1.5px solid #B91C1C; }
 
-.chip { display:inline-block; padding:3px 12px; border-radius:12px; font-weight:700; font-size:0.82em; }
-.chip-b  { background:#D4EDDA; color:#1B7E4A; }
-.chip-m  { background:#FFF3CD; color:#856404; }
-.chip-ma { background:#FFE0C2; color:#7D3C00; }
-.chip-a  { background:#F8D7DA; color:#7B1217; }
+.chip {
+    display:inline-block; padding:3px 12px; border-radius:100px;
+    font-weight:700; font-size:0.80em; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.chip-b  { background:#DCFCE7; color:#14532D; }
+.chip-m  { background:#FEF9C3; color:#713F12; }
+.chip-ma { background:#FFEDD5; color:#7C2D12; }
+.chip-a  { background:#FEE2E2; color:#7F1D1D; }
 
 /* ─── SECCIÓN TÍTULO ───────────────────────────────────── */
 .seccion-titulo {
-    background: linear-gradient(90deg, #0B4F8A, #1976C8);
-    color: #fff !important; padding: 10px 20px; border-radius: 8px;
-    font-weight: 800; font-size: 0.95em; letter-spacing: 0.05em;
-    text-transform: uppercase; margin: 22px 0 14px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(90deg, var(--navy-800) 0%, var(--navy-600) 100%);
+    color: #FFFFFF !important;
+    padding: 11px 22px;
+    border-radius: 10px;
+    font-weight: 700; font-size: 0.88em; letter-spacing: 0.07em;
+    text-transform: uppercase;
+    margin: 28px 0 16px 0;
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+}
+.seccion-titulo::after {
+    content: "";
+    position: absolute; right: 0; top: 0; bottom: 0;
+    width: 60px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08));
 }
 
 /* ─── INPUTS ───────────────────────────────────────────── */
 .stNumberInput input, .stTextInput input {
-    background: #FFFFFF !important;
-    border: 1.5px solid #B0C4D8 !important;
-    color: #1A2535 !important;
-    border-radius: 8px !important; font-weight: 600 !important;
+    background: var(--bg-card) !important;
+    border: 1.5px solid var(--border) !important;
+    color: var(--txt-body) !important;
+    border-radius: 9px !important;
+    font-weight: 500 !important;
+    font-size: 0.97em !important;
 }
 .stNumberInput input:focus, .stTextInput input:focus {
-    border-color: #1976C8 !important;
-    box-shadow: 0 0 0 3px rgba(25,118,200,0.15) !important;
+    border-color: var(--teal-600) !important;
+    box-shadow: 0 0 0 3px rgba(14,135,168,0.18) !important;
+    outline: none !important;
 }
 
 /* ─── BOTONES ──────────────────────────────────────────── */
 .stButton > button {
-    background: linear-gradient(135deg, #0B4F8A, #1976C8) !important;
-    color: #FFFFFF !important; border: none !important;
-    border-radius: 10px !important; padding: 12px 28px !important;
-    font-weight: 700 !important; font-size: 0.95em !important;
-    box-shadow: 0 4px 14px rgba(11,79,138,0.3) !important;
-    transition: all 0.2s !important;
+    background: linear-gradient(135deg, var(--navy-800) 0%, var(--navy-500) 100%) !important;
+    color: #FFFFFF !important;
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 11px 28px !important;
+    font-weight: 700 !important;
+    font-size: 0.93em !important;
+    box-shadow: 0 4px 16px rgba(7,24,48,0.28) !important;
+    transition: all 0.22s ease !important;
+    letter-spacing: 0.02em;
+    min-height: 44px !important;
+    white-space: normal !important;
+    line-height: 1.2 !important;
 }
 .stButton > button:hover {
     transform: translateY(-2px) !important;
-    box-shadow: 0 6px 20px rgba(11,79,138,0.4) !important;
+    box-shadow: 0 8px 24px rgba(7,24,48,0.36) !important;
+    background: linear-gradient(135deg, var(--navy-700) 0%, var(--navy-400) 100%) !important;
+}
+.stDownloadButton > button {
+    background: linear-gradient(135deg, var(--teal-700) 0%, var(--teal-500) 100%) !important;
+    color: #FFFFFF !important;
+    border: none !important;
+    border-radius: 10px !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 14px rgba(11,110,138,0.28) !important;
+    min-height: 44px !important;
+    white-space: normal !important;
+    line-height: 1.2 !important;
+    transition: all 0.22s ease !important;
+}
+.stDownloadButton > button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 22px rgba(11,110,138,0.38) !important;
 }
 
 /* ─── TABS ─────────────────────────────────────────────── */
 .stTabs [data-baseweb="tab-list"] {
-    background: #FFFFFF !important; border-radius: 10px !important;
-    padding: 4px !important; box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+    background: var(--bg-card) !important;
+    border-radius: 12px !important;
+    padding: 5px !important;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-soft);
 }
-.stTabs [data-baseweb="tab"] { color: #4A5568 !important; border-radius: 8px !important; font-weight: 600 !important; }
-.stTabs [aria-selected="true"] { background: #0B4F8A !important; color: #FFFFFF !important; }
+.stTabs [data-baseweb="tab"] {
+    color: var(--txt-muted) !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    font-size: 0.93em !important;
+}
+.stTabs [data-baseweb="tab"] p { color: var(--txt-muted) !important; font-weight: 600 !important; }
+.stTabs [aria-selected="true"] {
+    background: linear-gradient(135deg, var(--navy-800), var(--navy-600)) !important;
+    box-shadow: 0 2px 8px rgba(7,24,48,0.22) !important;
+}
+.stTabs [aria-selected="true"] p { color: #FFFFFF !important; }
 
-hr { border-color: #CBD5E1 !important; }
-/* Contraste reforzado */
-.card, .diag-panel, .stAlert, [data-testid="stMetric"] { color:#111827 !important; }
-.card *, .diag-panel *, [data-testid="stMetric"] * { color:#111827 !important; }
-.app-header *, .seccion-titulo, .seccion-titulo * { color:#FFFFFF !important; }
-.stMarkdown, .stTextInput label, .stNumberInput label, .stCheckbox label { color:#111827 !important; }
-input, textarea, select { background:#FFFFFF !important; color:#111827 !important; }
-.stTabs [data-baseweb="tab"] p { color:#111827 !important; }
-.stTabs [aria-selected="true"] p { color:#FFFFFF !important; }
-.autor-app { margin-top:10px; font-size:0.82em; font-weight:700; color:#FFFFFF !important; }
+hr { border-color: var(--border-soft) !important; opacity: 0.7; }
 
-/* ─── CONTRASTE Y USABILIDAD EN SMARTPHONES ───────────── */
-.stApp, .main, .block-container { color: #111827 !important; }
+/* ─── CONTRASTE GLOBAL ─────────────────────────────────── */
+html, body, .stApp, .stMarkdown, p, span, div, label {
+    color: var(--txt-body) !important;
+}
+.stApp { background-color: var(--bg-app) !important; }
+.card, .diag-panel, .stAlert, [data-testid="stMetric"],
+[data-testid="stExpander"], .stTabs, .stForm {
+    background-color: var(--bg-card) !important;
+    color: var(--txt-body) !important;
+}
+.card *, .diag-panel *, .stAlert *, [data-testid="stMetric"] * {
+    color: var(--txt-body) !important;
+}
 input, textarea, select,
 div[data-baseweb="select"] *,
 div[data-baseweb="input"] *,
 div[data-baseweb="textarea"] *,
 div[data-baseweb="checkbox"] *,
-div[data-baseweb="radio"] * { color: #111827 !important; }
+div[data-baseweb="radio"] * { color: var(--txt-body) !important; }
 .stTextInput input, .stNumberInput input, .stDateInput input,
 .stSelectbox div[data-baseweb="select"],
 .stMultiSelect div[data-baseweb="select"], textarea {
-    background-color: #FFFFFF !important;
-    color: #111827 !important;
-    border: 1.5px solid #64748B !important;
+    background-color: var(--bg-card) !important;
+    color: var(--txt-body) !important;
+    border: 1.5px solid var(--border) !important;
 }
 .stCheckbox label, .stRadio label, .stSelectbox label,
 .stMultiSelect label, .stDateInput label, .stNumberInput label, .stTextInput label {
-    color: #111827 !important;
-    font-weight: 700 !important;
+    color: var(--txt-body) !important;
+    font-weight: 600 !important;
 }
-.stAlert, .stAlert * { color: #111827 !important; }
-.stDownloadButton > button, .stButton > button {
-    min-height: 44px !important;
-    white-space: normal !important;
-    line-height: 1.2 !important;
+.stCheckbox span, .stRadio span { color: var(--txt-body) !important; }
+.stAlert, .stAlert * { color: var(--txt-body) !important; }
+[data-testid="stDataFrame"] *, [data-testid="stTable"] * {
+    color: var(--txt-body) !important;
+    background-color: var(--bg-card) !important;
 }
-[data-testid="stDataFrame"] *, [data-testid="stTable"] * { color: #111827 !important; }
+ul[role="listbox"], ul[role="listbox"] li, div[role="listbox"], div[role="option"] {
+    background-color: var(--bg-card) !important;
+    color: var(--txt-body) !important;
+}
+.stMarkdown h1, .stMarkdown h2, .stMarkdown h3 { color: var(--navy-700) !important; }
+.app-header *, .seccion-titulo, .seccion-titulo * { color: #FFFFFF !important; }
+.sema-pill, .sema-pill *, .chip, .chip *, .badge, .badge * { color: #000000 !important; }
+.autor-app { margin-top:10px; font-size:0.78em; font-weight:600; color:rgba(180,210,240,0.85) !important; }
+
+/* ─── SCROLLBAR ─────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-surface); }
+::-webkit-scrollbar-thumb { background: var(--navy-400); border-radius: 3px; }
+
+/* ─── RESPONSIVE ────────────────────────────────────────── */
 @media (max-width: 768px) {
     .block-container { padding-left: 0.75rem !important; padding-right: 0.75rem !important; padding-top: 1rem !important; }
-    .app-header { padding: 20px 18px !important; border-radius: 14px !important; }
-    .app-header h1 { font-size: 1.35em !important; line-height: 1.15 !important; }
-    .app-header p { font-size: 0.88em !important; color: #FFFFFF !important; }
-    .card, .diag-panel { padding: 16px 14px !important; border-radius: 12px !important; }
-    .sema-pill { font-size: 0.95em !important; padding: 6px 10px !important; margin: 3px 2px !important; }
-    .badge { display: block !important; width: 100% !important; text-align: center !important; white-space: normal !important; line-height: 1.25 !important; }
-    .stTabs [data-baseweb="tab"] { font-size: 0.85rem !important; padding-left: 8px !important; padding-right: 8px !important; }
-}
-
-
-
-/* ================= CONTRASTE GLOBAL CORREGIDO ================= */
-html, body, .stApp, .stMarkdown, p, span, div, label {
-    color: #111827 !important;
-}
-.stApp { background-color: #F3F6FA !important; }
-.card, .diag-panel, .stAlert, [data-testid="stMetric"],
-[data-testid="stExpander"], .stTabs, .stForm {
-    background-color: #FFFFFF !important;
-    color: #111827 !important;
-}
-.card *, .diag-panel *, .stAlert *, [data-testid="stMetric"] * {
-    color: #111827 !important;
-}
-input, textarea, select,
-.stTextInput input,
-.stNumberInput input,
-.stDateInput input,
-.stSelectbox div,
-.stMultiSelect div {
-    background-color: #FFFFFF !important;
-    color: #111827 !important;
-    border-color: #94A3B8 !important;
-}
-.stTextInput label,
-.stNumberInput label,
-.stDateInput label,
-.stSelectbox label,
-.stMultiSelect label,
-.stCheckbox label,
-.stRadio label {
-    color: #111827 !important;
-    font-weight: 700 !important;
-}
-.stCheckbox span, .stRadio span { color: #111827 !important; }
-section[data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #0B4F8A 0%, #082D52 100%) !important;
-}
-section[data-testid="stSidebar"] *,
-section[data-testid="stSidebar"] label,
-section[data-testid="stSidebar"] p,
-section[data-testid="stSidebar"] span {
-    color: #FFFFFF !important;
-}
-.stButton > button,
-.stDownloadButton > button {
-    background: #0B4F8A !important;
-    color: #FFFFFF !important;
-    border: 2px solid #0B4F8A !important;
-    font-weight: 800 !important;
-}
-.stTabs [data-baseweb="tab"] {
-    background-color: #E5E7EB !important;
-    color: #111827 !important;
-}
-.stTabs [data-baseweb="tab"] p {
-    color: #111827 !important;
-    font-weight: 800 !important;
-}
-.stTabs [aria-selected="true"] { background-color: #0B4F8A !important; }
-.stTabs [aria-selected="true"] p { color: #FFFFFF !important; }
-.sema-pill, .sema-pill *, .chip, .chip *, .badge, .badge * {
-    color: #000000 !important;
-}
-.app-header *, .seccion-titulo, .seccion-titulo * { color: #FFFFFF !important; }
-.stMarkdown h1, .stMarkdown h2, .stMarkdown h3 { color: #0B4F8A !important; }
-[data-testid="stDataFrame"] *, [data-testid="stTable"] * {
-    color: #111827 !important;
-    background-color: #FFFFFF !important;
-}
-/* Menús desplegables BaseWeb */
-ul[role="listbox"], ul[role="listbox"] li, div[role="listbox"], div[role="option"] {
-    background-color: #FFFFFF !important;
-    color: #111827 !important;
-}
-/* Columnas y contenedores Streamlit en móvil */
-@media (max-width: 768px) {
-    .block-container { padding-left: 0.7rem !important; padding-right: 0.7rem !important; }
-    .card, .diag-panel {
-        background-color: #FFFFFF !important;
-        color: #111827 !important;
-        padding: 16px 14px !important;
-    }
-    .card *, .diag-panel * { color: #111827 !important; }
-    input, textarea, select {
-        color: #111827 !important;
-        background-color: #FFFFFF !important;
-    }
-    .stButton > button, .stDownloadButton > button {
-        color: #FFFFFF !important;
-        background-color: #0B4F8A !important;
-        width: 100% !important;
-        min-height: 44px !important;
-    }
-    .app-header { padding: 22px 18px !important; }
-    .app-header h1 { font-size: 1.45em !important; }
+    .app-header { padding: 22px 20px !important; border-radius: 16px !important; }
+    .app-header h1 { font-size: 1.45em !important; line-height: 1.15 !important; }
+    .app-header p { font-size: 0.86em !important; }
+    .card, .diag-panel { padding: 16px 15px !important; border-radius: 13px !important; }
+    .sema-pill { font-size: 0.93em !important; padding: 5px 10px !important; margin: 3px 2px !important; }
+    .badge { display: block !important; width: 100% !important; text-align: center !important; white-space: normal !important; line-height: 1.3 !important; }
+    .stTabs [data-baseweb="tab"] { font-size: 0.84rem !important; padding-left: 8px !important; padding-right: 8px !important; }
+    .stButton > button, .stDownloadButton > button { width: 100% !important; }
 }
 
 </style>
@@ -1518,32 +1611,38 @@ def mostrar_interfaz():
     # ── SIDEBAR ───────────────────────────────────────
     with st.sidebar:
         st.markdown(f"""
-        <div style="text-align:center;padding:24px 0 16px;">
-            <div style="font-size:3.2em;">❤️</div>
-            <div style="font-size:1.15em;font-weight:800;color:#fff;margin-top:6px;">Dr. {st.session_state['user']}</div>
-            <div style="font-size:0.78em;color:#93C5FD;letter-spacing:0.05em;text-transform:uppercase;margin-top:2px;">MDPA 2026 Pro</div>
-            <div style="font-size:0.76em;color:#F8FAFC;margin-top:4px;">Matrícula: {st.session_state.get('matricula', '') or 'No informada'}</div>
+        <div style="text-align:center;padding:28px 0 18px;">
+            <div style="width:58px;height:58px;border-radius:50%;
+                background:linear-gradient(135deg,rgba(14,135,168,0.35),rgba(20,81,160,0.35));
+                border:1.5px solid rgba(255,255,255,0.18);
+                display:flex;align-items:center;justify-content:center;
+                margin:0 auto 12px;font-size:1.6em;box-shadow:0 4px 16px rgba(0,0,0,0.3);">
+                ❤️
+            </div>
+            <div style="font-size:1.08em;font-weight:700;color:#FFFFFF;margin-top:2px;letter-spacing:0.01em;">Dr. {st.session_state['user']}</div>
+            <div style="font-size:0.72em;color:rgba(14,160,200,0.9);letter-spacing:0.12em;text-transform:uppercase;margin-top:4px;font-weight:600;">MDPA 2026 Pro</div>
+            <div style="font-size:0.74em;color:rgba(180,210,240,0.75);margin-top:5px;">Mat.: {st.session_state.get('matricula', '') or '—'}</div>
             <div class="autor-app">{AUTOR_APP}</div>
         </div>
         """, unsafe_allow_html=True)
         st.markdown("---")
         st.markdown("**🇦🇷 Guía Argentina HTA 2025**")
         st.markdown("""
-        <div style="font-size:0.8em;line-height:2.2em;color:#BFDBFE;">
-        🏥 <b>Consultorio:</b> &lt;140/90 mmHg<br>
-        🏠 <b>MDPA:</b> &lt;135/85 mmHg<br>
-        ⌚ <b>MAPA 24h:</b> &lt;130/80 mmHg<br>
-        ☀️ <b>MAPA Diurno:</b> &lt;135/85 mmHg<br>
-        🌙 <b>MAPA Nocturno:</b> &lt;120/70 mmHg
+        <div style="font-size:0.79em;line-height:2.3em;color:rgba(180,215,245,0.9);">
+        🏥 <b style="color:#FFFFFF;">Consultorio:</b> &lt;140/90 mmHg<br>
+        🏠 <b style="color:#FFFFFF;">MDPA:</b> &lt;135/85 mmHg<br>
+        ⌚ <b style="color:#FFFFFF;">MAPA 24h:</b> &lt;130/80 mmHg<br>
+        ☀️ <b style="color:#FFFFFF;">MAPA Diurno:</b> &lt;135/85 mmHg<br>
+        🌙 <b style="color:#FFFFFF;">MAPA Nocturno:</b> &lt;120/70 mmHg
         </div>""", unsafe_allow_html=True)
         st.markdown("---")
         st.markdown("**🚦 Semáforo de valores**")
         st.markdown("""
-        <div class="sidebar-sema" style="font-size:0.8em;line-height:2.4em;">
-        <span style="background:#D4EDDA;color:#000000 !important;padding:3px 12px;border-radius:10px;font-weight:700;border:1px solid #1B7E4A;">🟢 Normal</span><br>
-        <span style="background:#FFF3CD;color:#000000 !important;padding:3px 12px;border-radius:10px;font-weight:700;border:1px solid #856404;">🟡 Elevado</span><br>
-        <span style="background:#FFE0C2;color:#000000 !important;padding:3px 12px;border-radius:10px;font-weight:700;border:1px solid #7D3C00;">🟠 Alto</span><br>
-        <span style="background:#F8D7DA;color:#000000 !important;padding:3px 12px;border-radius:10px;font-weight:700;border:1px solid #7B1217;">🔴 Muy Alto</span>
+        <div class="sidebar-sema" style="font-size:0.79em;line-height:2.5em;">
+        <span style="background:#DCFCE7;color:#14532D !important;padding:3px 13px;border-radius:100px;font-weight:700;border:1.5px solid #16A34A;box-shadow:0 1px 4px rgba(0,0,0,0.12);">🟢 Normal</span><br>
+        <span style="background:#FEF9C3;color:#713F12 !important;padding:3px 13px;border-radius:100px;font-weight:700;border:1.5px solid #CA8A04;box-shadow:0 1px 4px rgba(0,0,0,0.12);">🟡 Elevado</span><br>
+        <span style="background:#FFEDD5;color:#7C2D12 !important;padding:3px 13px;border-radius:100px;font-weight:700;border:1.5px solid #C2410C;box-shadow:0 1px 4px rgba(0,0,0,0.12);">🟠 Alto</span><br>
+        <span style="background:#FEE2E2;color:#7F1D1D !important;padding:3px 13px;border-radius:100px;font-weight:700;border:1.5px solid #B91C1C;box-shadow:0 1px 4px rgba(0,0,0,0.12);">🔴 Muy Alto</span>
         </div>""", unsafe_allow_html=True)
         st.markdown("---")
         if st.button("🚪 Cerrar Sesión", use_container_width=True):
@@ -1784,16 +1883,26 @@ def mostrar_interfaz():
 if not st.session_state["auth"]:
 
     st.markdown(f"""
-    <div style="max-width:520px;margin:60px auto 0;background:#fff;border-radius:20px;
-                padding:40px 44px;box-shadow:0 8px 32px rgba(11,79,138,0.13);border-top:6px solid #0B4F8A;">
-        <div style="text-align:center;margin-bottom:28px;">
-            <div style="font-size:3.5em;">❤️</div>
-            <h2 style="font-family:'Playfair Display',serif;color:#0B4F8A;margin:10px 0 4px;">MDPA 2026 Pro</h2>
-            <p style="color:#111827;font-size:0.88em;margin:0;">
-                Guía Argentina de Hipertensión Arterial 2025<br>SAHA / FAC / SAC
+    <div style="max-width:540px;margin:50px auto 0;
+                background:linear-gradient(160deg,#FFFFFF 0%,#F4F7FC 100%);
+                border-radius:22px;
+                padding:44px 48px;
+                box-shadow:0 8px 40px rgba(7,24,48,0.13),0 0 0 1px rgba(14,63,126,0.08);
+                border-top:5px solid transparent;
+                border-image:linear-gradient(90deg,#0A2240,#0E87A8) 1;">
+        <div style="text-align:center;margin-bottom:32px;">
+            <div style="width:72px;height:72px;border-radius:50%;
+                background:linear-gradient(135deg,#0A2240,#0E7490);
+                display:flex;align-items:center;justify-content:center;
+                margin:0 auto 16px;font-size:2em;
+                box-shadow:0 6px 22px rgba(7,24,48,0.25);">❤️</div>
+            <h2 style="font-family:'DM Serif Display',serif;color:#0A2240;margin:0 0 6px;font-size:1.9em;font-weight:400;letter-spacing:-0.3px;">MDPA 2026 Pro</h2>
+            <p style="color:#334155;font-size:0.86em;margin:0;line-height:1.5;">
+                Guía Argentina de Hipertensión Arterial 2025<br>
+                <span style="color:#0E7490;font-weight:600;">SAHA · FAC · SAC</span>
             </p>
-            <p style="color:#111827;font-size:0.82em;font-weight:700;margin-top:10px;">
-                Autor: {AUTOR_APP}
+            <p style="color:#64748B;font-size:0.78em;font-weight:500;margin-top:10px;border-top:1px solid #E2E8F0;padding-top:10px;">
+                {AUTOR_APP}
             </p>
         </div>
     </div>
@@ -1842,9 +1951,9 @@ if not st.session_state["auth"]:
                     st.warning("⚠️ " + mensaje)
 
     st.markdown(f"""
-    <div style="text-align:center;color:#111827;font-size:0.78em;margin-top:30px;">
+    <div style="text-align:center;color:#94A3B8;font-size:0.76em;margin-top:28px;letter-spacing:0.03em;">
         MDPA 2026 Pro · Herramienta de apoyo diagnóstico · Uso exclusivo del profesional médico<br>
-        {AUTOR_APP}
+        <span style="color:#64748B;">{AUTOR_APP}</span>
     </div>
     """, unsafe_allow_html=True)
 
