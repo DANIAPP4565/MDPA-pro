@@ -885,9 +885,12 @@ def generar_pdf(datos, res):
         pdf.set_fill_color(*ROJO_PDF); pdf.set_text_color(*tc(ROJO_PDF)); pdf.set_font("Arial","B",11)
         pdf.multi_cell(0,9, f"FENOTIPO MAPA: {r.get('fenotipo_mapa')}", border=1, align="C", fill=True)
         pdf.set_text_color(0,0,0); pdf.ln(2)
+        pdf.set_fill_color(*GRIS_CLR); pdf.set_text_color(0,0,0); pdf.set_font("Arial","",9)
+        pdf.multi_cell(0,7, r.get("fenotipo_mapa_texto", ""), border=1, fill=True)
+        pdf.ln(2)
     else:
         pdf.set_fill_color(*GRIS_CLR); pdf.set_text_color(0,0,0); pdf.set_font("Arial","B",9)
-        pdf.multi_cell(0,8, "No corresponde a ninguno de los fenotipos MAPA predefinidos. Se informan solo los promedios.", border=1, fill=True)
+        pdf.multi_cell(0,8, r.get("fenotipo_mapa_texto", "No corresponde a ninguno de los fenotipos MAPA predefinidos. Se informan solo los promedios."), border=1, fill=True)
         pdf.ln(2)
     pdf.fila_header(["Periodo MAPA", "Promedio PAS", "Promedio PAD", "Umbral MAPA"], [50, 40, 40, 70])
     filas_mapa_fen = [
@@ -1587,7 +1590,15 @@ def mostrar_interfaz():
             st.markdown(f'<span class="badge badge-sostenida">{res["fenotipo_mapa"]}</span>', unsafe_allow_html=True)
         else:
             st.info("No corresponde a ninguno de los fenotipos MAPA predefinidos. Se informan solo los promedios.")
-        st.markdown(f"**Promedios MAPA:** 24 h `{m24s}/{m24d} mmHg` · diurno `{mdia_s}/{mdia_d} mmHg` · nocturno `{mnoc_s}/{mnoc_d} mmHg`")
+        st.markdown(
+            f"""
+            <div class="card" style="border-top:4px solid #0B4F8A; margin-top:10px;">
+                <b>Fenotipo hipertensivo integrado:</b><br>
+                {res.get('fenotipo_mapa_texto', '')}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
         # Chips de factores de riesgo activos
         frc_activos = []
         frc_labels = {"diabetes":"Diabetes","tabaquismo":"Tabaquismo","dislipemia":"Dislipemia",
