@@ -651,6 +651,147 @@ section[data-testid="stSidebar"] a {
         color: #FFFFFF !important;
     }
 }
+
+
+/* ============ CORRECCIÓN EXTRA: BARRA / MENÚ DERECHO Y PANELES FLOTANTES ============
+   Evita texto blanco sobre fondo blanco en barra derecha, menú de Streamlit,
+   desplegables, popovers, tooltips y paneles laterales emergentes. */
+
+/* Barra superior/derecha de Streamlit y botones de menú */
+[data-testid="stToolbar"],
+[data-testid="stToolbar"] *,
+[data-testid="stDecoration"],
+[data-testid="stDecoration"] *,
+[data-testid="stStatusWidget"],
+[data-testid="stStatusWidget"] *,
+[data-testid="stHeader"],
+[data-testid="stHeader"] * {
+    color: #111827 !important;
+}
+
+[data-testid="stToolbar"] button,
+[data-testid="stToolbar"] button *,
+[data-testid="stStatusWidget"] button,
+[data-testid="stStatusWidget"] button * {
+    color: #111827 !important;
+    background-color: #FFFFFF !important;
+    border-color: #CBD5E1 !important;
+}
+
+/* Menú desplegable superior derecho / paneles flotantes */
+div[data-baseweb="popover"],
+div[data-baseweb="popover"] *,
+div[data-baseweb="menu"],
+div[data-baseweb="menu"] *,
+ul[data-baseweb="menu"],
+ul[data-baseweb="menu"] *,
+ul[role="menu"],
+ul[role="menu"] *,
+div[role="menu"],
+div[role="menu"] *,
+li[role="menuitem"],
+li[role="menuitem"] *,
+div[role="dialog"],
+div[role="dialog"] *,
+div[data-testid="stPopover"],
+div[data-testid="stPopover"] * {
+    background-color: #FFFFFF !important;
+    color: #111827 !important;
+    border-color: #CBD5E1 !important;
+}
+
+/* Dropdowns y opciones seleccionables */
+ul[role="listbox"],
+ul[role="listbox"] *,
+div[role="listbox"],
+div[role="listbox"] *,
+div[role="option"],
+div[role="option"] *,
+li[role="option"],
+li[role="option"] * {
+    background-color: #FFFFFF !important;
+    color: #111827 !important;
+}
+
+div[role="option"][aria-selected="true"],
+div[role="option"][aria-selected="true"] *,
+li[role="option"][aria-selected="true"],
+li[role="option"][aria-selected="true"] * {
+    background-color: #D6EAF8 !important;
+    color: #111827 !important;
+}
+
+/* Scrollbar vertical derecha: visible y profesional */
+::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+::-webkit-scrollbar-track {
+    background: #E5E7EB;
+}
+::-webkit-scrollbar-thumb {
+    background: #0B4F8A;
+    border-radius: 10px;
+    border: 2px solid #E5E7EB;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #063B6B;
+}
+
+/* Excepción: sidebar izquierda azul debe conservar texto blanco */
+section[data-testid="stSidebar"],
+section[data-testid="stSidebar"] *:not(input):not(textarea):not(select):not(button) {
+    color: #FFFFFF !important;
+}
+section[data-testid="stSidebar"] button,
+section[data-testid="stSidebar"] button * {
+    background-color: #FFFFFF !important;
+    color: #0B4F8A !important;
+}
+
+/* Excepción: botones principales fuera de sidebar siguen azul con texto blanco */
+.main .stButton > button,
+.main .stDownloadButton > button,
+div[data-testid="stVerticalBlock"] .stButton > button,
+div[data-testid="stVerticalBlock"] .stDownloadButton > button {
+    background-color: #0B4F8A !important;
+    color: #FFFFFF !important;
+    border-color: #0B4F8A !important;
+}
+.main .stButton > button *,
+.main .stDownloadButton > button *,
+div[data-testid="stVerticalBlock"] .stButton > button *,
+div[data-testid="stVerticalBlock"] .stDownloadButton > button * {
+    color: #FFFFFF !important;
+}
+
+/* Tarjetas oscuras/azules: texto siempre blanco */
+.app-header,
+.app-header *,
+.seccion-titulo,
+.seccion-titulo * {
+    color: #FFFFFF !important;
+}
+
+/* Tarjetas claras: texto siempre oscuro */
+.card,
+.card *,
+.diag-panel,
+.diag-panel *,
+[data-testid="stAlert"],
+[data-testid="stAlert"] *,
+[data-testid="stExpander"],
+[data-testid="stExpander"] * {
+    color: #111827 !important;
+}
+
+/* Pero títulos de sección internos conservan contraste */
+.card-title.ct-cons { color: #0B4F8A !important; }
+.card-title.ct-mdpa { color: #0F766E !important; }
+.card-title.ct-mapa { color: #5B21B6 !important; }
+.card-title.ct-diu  { color: #92400E !important; }
+.card-title.ct-noc  { color: #334155 !important; }
+
 </style>
 """, unsafe_allow_html=True)
 
