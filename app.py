@@ -342,6 +342,63 @@ section[data-testid="stSidebar"] a, section[data-testid="stSidebar"] a:visited {
     input, textarea, select, [data-baseweb="select"], [data-baseweb="select"] * { font-size:16px !important; }
     .stTabs [data-baseweb="tab"] { padding-left:8px !important; padding-right:8px !important; font-size:.85rem !important; }
 }
+
+
+/* =========================================================
+   FIX DEFINITIVO SIDEBAR - SEMÁFORO Y BLOQUES CLAROS
+   Este bloque va al final para ganar prioridad.
+   ========================================================= */
+section[data-testid="stSidebar"] .sidebar-sema,
+section[data-testid="stSidebar"] .sidebar-sema div {
+    background: transparent !important;
+    color: #111827 !important;
+}
+
+section[data-testid="stSidebar"] .sidebar-sema span,
+section[data-testid="stSidebar"] .sidebar-sema span *,
+section[data-testid="stSidebar"] div.sidebar-sema span,
+section[data-testid="stSidebar"] div.sidebar-sema span * {
+    color: #111827 !important;
+    text-shadow: none !important;
+    font-weight: 900 !important;
+}
+
+section[data-testid="stSidebar"] .sidebar-sema span {
+    display: inline-block !important;
+    min-width: 112px !important;
+    padding: 5px 12px !important;
+    border-radius: 12px !important;
+    box-shadow: 0 1px 4px rgba(0,0,0,.15) !important;
+}
+
+/* Bloque de referencias en sidebar: usar tarjeta azul oscuro para evitar blanco sobre blanco */
+section[data-testid="stSidebar"] .sidebar-ref,
+section[data-testid="stSidebar"] .sidebar-ref *,
+section[data-testid="stSidebar"] div.sidebar-ref,
+section[data-testid="stSidebar"] div.sidebar-ref * {
+    color: #FFFFFF !important;
+    background: transparent !important;
+    text-shadow: none !important;
+}
+
+section[data-testid="stSidebar"] .sidebar-ref {
+    background: rgba(3, 37, 65, 0.38) !important;
+    border: 1px solid rgba(255,255,255,.24) !important;
+    border-radius: 12px !important;
+    padding: 10px 12px !important;
+}
+
+/* Si Streamlit envuelve el HTML en párrafos/spans, mantener el contraste correcto */
+section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] .sidebar-sema span,
+section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] .sidebar-sema span * {
+    color: #111827 !important;
+}
+
+section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] .sidebar-ref,
+section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] .sidebar-ref * {
+    color: #FFFFFF !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -1511,7 +1568,7 @@ def mostrar_interfaz():
         st.markdown("---")
         st.markdown("**🇦🇷 Guía Argentina HTA 2025**")
         st.markdown("""
-        <div style="font-size:0.8em;line-height:2.2em;color:#BFDBFE;">
+        <div class="sidebar-ref" style="font-size:0.8em;line-height:2.2em;">
         🏥 <b>Consultorio:</b> &lt;140/90 mmHg<br>
         🏠 <b>MDPA:</b> &lt;135/85 mmHg<br>
         ⌚ <b>MAPA 24h:</b> &lt;130/80 mmHg<br>
