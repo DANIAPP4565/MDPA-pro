@@ -23,475 +23,204 @@ st.markdown("""
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&family=Playfair+Display:wght@700&display=swap');
 
 :root {
-    --blanco:      #FFFFFF;
-    --gris-fondo:  #F0F4F8;
-    --gris-borde:  #CBD5E1;
-    --azul-oscuro: #0B4F8A;
-    --azul-medio:  #1976C8;
-    --azul-claro:  #D6EAF8;
-    --celeste:     #EBF5FF;
-    --verde:       #1B7E4A;
-    --verde-bg:    #D4EDDA;
-    --amarillo:    #856404;
-    --amarillo-bg: #FFF3CD;
-    --naranja:     #7D3C00;
-    --naranja-bg:  #FFE0C2;
-    --rojo:        #7B1217;
-    --rojo-bg:     #F8D7DA;
-    --texto:       #1A2535;
-    --texto-suave: #4A5568;
+    --azul-oscuro:#0B4F8A;
+    --azul-medio:#1976C8;
+    --azul-hover:#063B6B;
+    --fondo:#F3F6FA;
+    --panel:#FFFFFF;
+    --texto:#111827;
+    --texto-suave:#334155;
+    --borde:#CBD5E1;
+    --verde-bg:#D4EDDA;
+    --amarillo-bg:#FFF3CD;
+    --naranja-bg:#FFE0C2;
+    --rojo-bg:#F8D7DA;
 }
-
-html, body, [class*="css"] {
-    font-family: 'Nunito', sans-serif !important;
-    background-color: var(--gris-fondo) !important;
-    color: var(--texto) !important;
-}
-
-.stApp { background-color: var(--gris-fondo) !important; }
-
-/* ─── SIDEBAR ──────────────────────────────────────────── */
-section[data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #0B4F8A 0%, #0d3d6b 60%, #082d52 100%) !important;
-    border-right: none !important;
-}
-section[data-testid="stSidebar"] .stMarkdown,
-section[data-testid="stSidebar"] p,
-section[data-testid="stSidebar"] span,
-section[data-testid="stSidebar"] div,
-section[data-testid="stSidebar"] label {
-    color: #DBEAFE !important;
-}
-section[data-testid="stSidebar"] h2,
-section[data-testid="stSidebar"] h3 { color: #FFFFFF !important; }
-
-/* ─── HEADER PRINCIPAL ─────────────────────────────────── */
-.app-header {
-    background: linear-gradient(135deg, #0B4F8A 0%, #1565C0 60%, #1976C8 100%);
-    border-radius: 18px;
-    padding: 32px 40px;
-    margin-bottom: 28px;
-    box-shadow: 0 6px 24px rgba(11,79,138,0.22);
-    position: relative;
-    overflow: hidden;
-}
-.app-header::before {
-    content: "❤";
-    position: absolute;
-    right: 40px; top: 50%;
-    transform: translateY(-50%);
-    font-size: 7em;
-    opacity: 0.08;
-}
-.app-header h1 {
-    font-family: 'Playfair Display', serif !important;
-    color: #FFFFFF !important; font-size: 2em !important;
-    margin: 0 !important; letter-spacing: -0.3px;
-}
-.app-header p { color: #B3D4F5 !important; margin: 6px 0 0 0 !important; font-size: 0.95em; }
-
-/* ─── TARJETAS DE MEDICIÓN ─────────────────────────────── */
-.card {
-    background: #FFFFFF;
-    border-radius: 14px;
-    padding: 22px 24px;
-    margin-bottom: 12px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-    border-top: 4px solid;
-}
-.card-consultorio { border-color: #1976C8; }
-.card-mdpa        { border-color: #17A589; }
-.card-mapa        { border-color: #7B68EE; }
-.card-diurno      { border-color: #F39C12; }
-.card-nocturno    { border-color: #5D6D7E; }
-
-.card-title {
-    font-weight: 800; font-size: 0.92em;
-    letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 12px;
-}
-.ct-cons { color: #1976C8; }
-.ct-mdpa { color: #17A589; }
-.ct-mapa { color: #7B68EE; }
-.ct-diu  { color: #F39C12; }
-.ct-noc  { color: #5D6D7E; }
-
-/* ─── SEMÁFOROS ────────────────────────────────────────── */
-.sema-pill {
-    display: inline-block;
-    padding: 4px 14px;
-    border-radius: 20px;
-    font-weight: 800;
-    font-size: 1.05em;
-    margin: 2px 4px;
-    letter-spacing: 0.02em;
-    border: 2px solid transparent;
-}
-.sema-verde    { background: var(--verde-bg);    color: var(--verde);    border-color: #1B7E4A; }
-.sema-amarillo { background: var(--amarillo-bg); color: var(--amarillo); border-color: #856404; }
-.sema-naranja  { background: var(--naranja-bg);  color: var(--naranja);  border-color: #7D3C00; }
-.sema-rojo     { background: var(--rojo-bg);     color: var(--rojo);     border-color: #7B1217; }
-
-.sema-label {
-    font-size: 0.72em; font-weight: 700;
-    letter-spacing: 0.06em; text-transform: uppercase;
-    margin-right: 4px; opacity: 0.75;
-}
-
-section[data-testid="stSidebar"] .sidebar-sema,
-section[data-testid="stSidebar"] .sidebar-sema span,
-section[data-testid="stSidebar"] .sidebar-sema b {
-    color: #000000 !important;
-}
-.sema-pill, .sema-pill small, .sema-chip-negro {
-    color: #000000 !important;
-}
-
-/* ─── PANEL DIAGNÓSTICO ────────────────────────────────── */
-.diag-panel {
-    background: #FFFFFF;
-    border-radius: 14px; padding: 28px 32px; margin-top: 22px;
-    box-shadow: 0 2px 16px rgba(0,0,0,0.08);
-    border-left: 6px solid #1976C8;
-}
-.diag-panel h3 { color: #0B4F8A !important; margin-top:0 !important; }
-
-.badge {
-    display: inline-block; padding: 8px 22px; border-radius: 24px;
-    font-weight: 800; font-size: 1em; letter-spacing: 0.03em;
-}
-.badge-normal    { background:#D4EDDA; color:#1B7E4A; border:2px solid #1B7E4A; }
-.badge-bata      { background:#D6EAF8; color:#1565C0; border:2px solid #1565C0; }
-.badge-enmasc    { background:#FFE0C2; color:#7D3C00; border:2px solid #E67E22; }
-.badge-sostenida { background:#F8D7DA; color:#7B1217; border:2px solid #C0392B; }
-
-.chip { display:inline-block; padding:3px 12px; border-radius:12px; font-weight:700; font-size:0.82em; }
-.chip-b  { background:#D4EDDA; color:#1B7E4A; }
-.chip-m  { background:#FFF3CD; color:#856404; }
-.chip-ma { background:#FFE0C2; color:#7D3C00; }
-.chip-a  { background:#F8D7DA; color:#7B1217; }
-
-/* ─── SECCIÓN TÍTULO ───────────────────────────────────── */
-.seccion-titulo {
-    background: linear-gradient(90deg, #0B4F8A, #1976C8);
-    color: #fff !important; padding: 10px 20px; border-radius: 8px;
-    font-weight: 800; font-size: 0.95em; letter-spacing: 0.05em;
-    text-transform: uppercase; margin: 22px 0 14px 0;
-}
-
-/* ─── INPUTS ───────────────────────────────────────────── */
-.stNumberInput input, .stTextInput input {
-    background: #FFFFFF !important;
-    border: 1.5px solid #B0C4D8 !important;
-    color: #1A2535 !important;
-    border-radius: 8px !important; font-weight: 600 !important;
-}
-.stNumberInput input:focus, .stTextInput input:focus {
-    border-color: #1976C8 !important;
-    box-shadow: 0 0 0 3px rgba(25,118,200,0.15) !important;
-}
-
-/* ─── BOTONES ──────────────────────────────────────────── */
-.stButton > button {
-    background: linear-gradient(135deg, #0B4F8A, #1976C8) !important;
-    color: #FFFFFF !important; border: none !important;
-    border-radius: 10px !important; padding: 12px 28px !important;
-    font-weight: 700 !important; font-size: 0.95em !important;
-    box-shadow: 0 4px 14px rgba(11,79,138,0.3) !important;
-    transition: all 0.2s !important;
-}
-.stButton > button:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 6px 20px rgba(11,79,138,0.4) !important;
-}
-
-/* ─── TABS ─────────────────────────────────────────────── */
-.stTabs [data-baseweb="tab-list"] {
-    background: #FFFFFF !important; border-radius: 10px !important;
-    padding: 4px !important; box-shadow: 0 1px 6px rgba(0,0,0,0.07);
-}
-.stTabs [data-baseweb="tab"] { color: #4A5568 !important; border-radius: 8px !important; font-weight: 600 !important; }
-.stTabs [aria-selected="true"] { background: #0B4F8A !important; color: #FFFFFF !important; }
-
-hr { border-color: #CBD5E1 !important; }
-/* Contraste reforzado */
-.card, .diag-panel, .stAlert, [data-testid="stMetric"] { color:#111827 !important; }
-.card *, .diag-panel *, [data-testid="stMetric"] * { color:#111827 !important; }
-.app-header *, .seccion-titulo, .seccion-titulo * { color:#FFFFFF !important; }
-.stMarkdown, .stTextInput label, .stNumberInput label, .stCheckbox label { color:#111827 !important; }
-input, textarea, select { background:#FFFFFF !important; color:#111827 !important; }
-.stTabs [data-baseweb="tab"] p { color:#111827 !important; }
-.stTabs [aria-selected="true"] p { color:#FFFFFF !important; }
-.autor-app { margin-top:10px; font-size:0.82em; font-weight:700; color:#FFFFFF !important; }
-
-/* ─── CONTRASTE Y USABILIDAD EN SMARTPHONES ───────────── */
-.stApp, .main, .block-container { color: #111827 !important; }
-input, textarea, select,
-div[data-baseweb="select"] *,
-div[data-baseweb="input"] *,
-div[data-baseweb="textarea"] *,
-div[data-baseweb="checkbox"] *,
-div[data-baseweb="radio"] * { color: #111827 !important; }
-.stTextInput input, .stNumberInput input, .stDateInput input,
-.stSelectbox div[data-baseweb="select"],
-.stMultiSelect div[data-baseweb="select"], textarea {
-    background-color: #FFFFFF !important;
-    color: #111827 !important;
-    border: 1.5px solid #64748B !important;
-}
-.stCheckbox label, .stRadio label, .stSelectbox label,
-.stMultiSelect label, .stDateInput label, .stNumberInput label, .stTextInput label {
-    color: #111827 !important;
-    font-weight: 700 !important;
-}
-.stAlert, .stAlert * { color: #111827 !important; }
-.stDownloadButton > button, .stButton > button {
-    min-height: 44px !important;
-    white-space: normal !important;
-    line-height: 1.2 !important;
-}
-[data-testid="stDataFrame"] *, [data-testid="stTable"] * { color: #111827 !important; }
-@media (max-width: 768px) {
-    .block-container { padding-left: 0.75rem !important; padding-right: 0.75rem !important; padding-top: 1rem !important; }
-    .app-header { padding: 20px 18px !important; border-radius: 14px !important; }
-    .app-header h1 { font-size: 1.35em !important; line-height: 1.15 !important; }
-    .app-header p { font-size: 0.88em !important; color: #FFFFFF !important; }
-    .card, .diag-panel { padding: 16px 14px !important; border-radius: 12px !important; }
-    .sema-pill { font-size: 0.95em !important; padding: 6px 10px !important; margin: 3px 2px !important; }
-    .badge { display: block !important; width: 100% !important; text-align: center !important; white-space: normal !important; line-height: 1.25 !important; }
-    .stTabs [data-baseweb="tab"] { font-size: 0.85rem !important; padding-left: 8px !important; padding-right: 8px !important; }
-}
-
-
-
-/* ================= CONTRASTE GLOBAL CORREGIDO ================= */
-html, body, .stApp, .stMarkdown, p, span, div, label {
-    color: #111827 !important;
-}
-.stApp { background-color: #F3F6FA !important; }
-.card, .diag-panel, .stAlert, [data-testid="stMetric"],
-[data-testid="stExpander"], .stTabs, .stForm {
-    background-color: #FFFFFF !important;
-    color: #111827 !important;
-}
-.card *, .diag-panel *, .stAlert *, [data-testid="stMetric"] * {
-    color: #111827 !important;
-}
-input, textarea, select,
-.stTextInput input,
-.stNumberInput input,
-.stDateInput input,
-.stSelectbox div,
-.stMultiSelect div {
-    background-color: #FFFFFF !important;
-    color: #111827 !important;
-    border-color: #94A3B8 !important;
-}
-.stTextInput label,
-.stNumberInput label,
-.stDateInput label,
-.stSelectbox label,
-.stMultiSelect label,
-.stCheckbox label,
-.stRadio label {
-    color: #111827 !important;
-    font-weight: 700 !important;
-}
-.stCheckbox span, .stRadio span { color: #111827 !important; }
-section[data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #0B4F8A 0%, #082D52 100%) !important;
-}
-section[data-testid="stSidebar"] *,
-section[data-testid="stSidebar"] label,
-section[data-testid="stSidebar"] p,
-section[data-testid="stSidebar"] span {
-    color: #FFFFFF !important;
-}
-.stButton > button,
-.stDownloadButton > button {
-    background: #0B4F8A !important;
-    color: #FFFFFF !important;
-    border: 2px solid #0B4F8A !important;
-    font-weight: 800 !important;
-}
-.stTabs [data-baseweb="tab"] {
-    background-color: #E5E7EB !important;
-    color: #111827 !important;
-}
-.stTabs [data-baseweb="tab"] p {
-    color: #111827 !important;
-    font-weight: 800 !important;
-}
-.stTabs [aria-selected="true"] { background-color: #0B4F8A !important; }
-.stTabs [aria-selected="true"] p { color: #FFFFFF !important; }
-.sema-pill, .sema-pill *, .chip, .chip *, .badge, .badge * {
-    color: #000000 !important;
-}
-.app-header *, .seccion-titulo, .seccion-titulo * { color: #FFFFFF !important; }
-.stMarkdown h1, .stMarkdown h2, .stMarkdown h3 { color: #0B4F8A !important; }
-[data-testid="stDataFrame"] *, [data-testid="stTable"] * {
-    color: #111827 !important;
-    background-color: #FFFFFF !important;
-}
-/* Menús desplegables BaseWeb */
-ul[role="listbox"], ul[role="listbox"] li, div[role="listbox"], div[role="option"] {
-    background-color: #FFFFFF !important;
-    color: #111827 !important;
-}
-/* Columnas y contenedores Streamlit en móvil */
-@media (max-width: 768px) {
-    .block-container { padding-left: 0.7rem !important; padding-right: 0.7rem !important; }
-    .card, .diag-panel {
-        background-color: #FFFFFF !important;
-        color: #111827 !important;
-        padding: 16px 14px !important;
-    }
-    .card *, .diag-panel * { color: #111827 !important; }
-    input, textarea, select {
-        color: #111827 !important;
-        background-color: #FFFFFF !important;
-    }
-    .stButton > button, .stDownloadButton > button {
-        color: #FFFFFF !important;
-        background-color: #0B4F8A !important;
-        width: 100% !important;
-        min-height: 44px !important;
-    }
-    .app-header { padding: 22px 18px !important; }
-    .app-header h1 { font-size: 1.45em !important; }
-}
-
-
 
 /* =========================================================
-   CORRECCIÓN DEFINITIVA DE CONTRASTE - MDPA 2026
-   Regla clínica visual:
-   - Fondos oscuros/azules: letra blanca.
-   - Fondos claros/blancos: letra negra.
-   - Semáforos claros: letra negra.
-   - Formularios móviles: alto contraste.
+   BASE GENERAL: fondo claro = letras oscuras
    ========================================================= */
-
-/* Base clara de toda la app */
-.stApp, .main, .block-container,
+html, body, .stApp, .main, .block-container,
 [data-testid="stAppViewContainer"],
 [data-testid="stVerticalBlock"],
 [data-testid="stHorizontalBlock"] {
-    background-color: #F3F6FA !important;
-    color: #111827 !important;
+    font-family:'Nunito', sans-serif !important;
+    background-color:var(--fondo) !important;
+    color:var(--texto) !important;
 }
 
-/* Texto normal en zonas claras */
-.stMarkdown, .stMarkdown p, .stMarkdown span, .stMarkdown li,
-.stText, p, label,
-[data-testid="stWidgetLabel"],
-[data-testid="stWidgetLabel"] *,
+p, span, div, label, li,
+.stMarkdown, .stMarkdown *,
 [data-testid="stMarkdownContainer"],
-[data-testid="stMarkdownContainer"] p,
-[data-testid="stMarkdownContainer"] span,
-[data-testid="stMarkdownContainer"] li {
-    color: #111827 !important;
+[data-testid="stMarkdownContainer"] * {
+    color:var(--texto) !important;
 }
 
-/* Títulos normales fuera de encabezados azules */
 .stMarkdown h1, .stMarkdown h2, .stMarkdown h3,
 [data-testid="stMarkdownContainer"] h1,
 [data-testid="stMarkdownContainer"] h2,
 [data-testid="stMarkdownContainer"] h3 {
-    color: #0B4F8A !important;
+    color:var(--azul-oscuro) !important;
+    font-weight:800 !important;
 }
 
-/* Header superior azul: todo blanco */
-.app-header,
-.app-header *,
-.app-header h1,
-.app-header h2,
-.app-header h3,
-.app-header p,
-.app-header span,
-.app-header div,
-.autor-app {
-    color: #FFFFFF !important;
+/* =========================================================
+   SIDEBAR IZQUIERDA: fondo azul oscuro = letras claras
+   ========================================================= */
+section[data-testid="stSidebar"] {
+    background:linear-gradient(180deg,#0B4F8A 0%,#0A3D68 55%,#062A49 100%) !important;
+    border-right:0 !important;
+}
+section[data-testid="stSidebar"] [data-testid="stSidebarContent"],
+section[data-testid="stSidebar"] [data-testid="stVerticalBlock"],
+section[data-testid="stSidebar"] .element-container {
+    background:transparent !important;
 }
 
-/* Barras/títulos de sección azules: todo blanco */
-.seccion-titulo,
-.seccion-titulo *,
-div.seccion-titulo,
-div.seccion-titulo p,
-div.seccion-titulo span,
-div.seccion-titulo strong,
-div.seccion-titulo b {
-    color: #FFFFFF !important;
-    background-color: transparent !important;
+section[data-testid="stSidebar"] h1,
+section[data-testid="stSidebar"] h2,
+section[data-testid="stSidebar"] h3,
+section[data-testid="stSidebar"] h4,
+section[data-testid="stSidebar"] strong,
+section[data-testid="stSidebar"] b {
+    color:#FFFFFF !important;
+    text-shadow:none !important;
 }
 
-/* Sidebar oscuro: texto blanco */
-section[data-testid="stSidebar"],
-section[data-testid="stSidebar"] *:not(input):not(textarea):not(select) {
-    color: #FFFFFF !important;
+section[data-testid="stSidebar"] p,
+section[data-testid="stSidebar"] span,
+section[data-testid="stSidebar"] label,
+section[data-testid="stSidebar"] div,
+section[data-testid="stSidebar"] li,
+section[data-testid="stSidebar"] small,
+section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"],
+section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] * {
+    color:#EAF2FF !important;
+    text-shadow:none !important;
 }
+
+/* Cajas claras dentro de sidebar: texto oscuro para evitar blanco sobre blanco */
 section[data-testid="stSidebar"] input,
 section[data-testid="stSidebar"] textarea,
-section[data-testid="stSidebar"] select {
-    background-color: #FFFFFF !important;
-    color: #111827 !important;
+section[data-testid="stSidebar"] select,
+section[data-testid="stSidebar"] [data-baseweb="input"],
+section[data-testid="stSidebar"] [data-baseweb="textarea"],
+section[data-testid="stSidebar"] [data-baseweb="select"],
+section[data-testid="stSidebar"] [data-testid="stTextInput"] div,
+section[data-testid="stSidebar"] [data-testid="stNumberInput"] div {
+    background-color:#FFFFFF !important;
+    color:#111827 !important;
+    border-color:#CBD5E1 !important;
 }
+section[data-testid="stSidebar"] input *,
+section[data-testid="stSidebar"] textarea *,
+section[data-testid="stSidebar"] select *,
+section[data-testid="stSidebar"] [data-baseweb="select"] * {
+    color:#111827 !important;
+}
+section[data-testid="stSidebar"] input::placeholder,
+section[data-testid="stSidebar"] textarea::placeholder {
+    color:#475569 !important;
+    opacity:1 !important;
+}
+section[data-testid="stSidebar"] hr { border-color:rgba(255,255,255,.35) !important; }
+
+/* Botones dentro sidebar: fondo blanco, texto azul */
 section[data-testid="stSidebar"] .stButton > button,
-section[data-testid="stSidebar"] .stDownloadButton > button {
-    background-color: #FFFFFF !important;
-    color: #0B4F8A !important;
-    border: 2px solid #FFFFFF !important;
+section[data-testid="stSidebar"] .stDownloadButton > button,
+section[data-testid="stSidebar"] button {
+    background:#FFFFFF !important;
+    color:#0B4F8A !important;
+    border:2px solid #FFFFFF !important;
+    font-weight:800 !important;
+}
+section[data-testid="stSidebar"] .stButton > button *,
+section[data-testid="stSidebar"] .stDownloadButton > button *,
+section[data-testid="stSidebar"] button * {
+    color:#0B4F8A !important;
 }
 
-/* Tarjetas claras: texto negro */
+/* =========================================================
+   HEADER Y BANDAS AZULES: letras blancas
+   ========================================================= */
+.app-header {
+    background:linear-gradient(135deg,#0B4F8A 0%,#1565C0 60%,#1976C8 100%) !important;
+    border-radius:18px !important;
+    padding:32px 40px !important;
+    margin-bottom:28px !important;
+    box-shadow:0 6px 24px rgba(11,79,138,.22) !important;
+    position:relative !important;
+    overflow:hidden !important;
+}
+.app-header::before {
+    content:"❤";
+    position:absolute;
+    right:40px; top:50%; transform:translateY(-50%);
+    font-size:7em; opacity:.08;
+}
+.app-header, .app-header *, .app-header h1, .app-header p,
+.seccion-titulo, .seccion-titulo *,
+div.seccion-titulo, div.seccion-titulo * {
+    color:#FFFFFF !important;
+}
+.app-header h1 {
+    font-family:'Playfair Display', serif !important;
+    font-size:2em !important;
+    margin:0 !important;
+}
+.app-header p { margin:6px 0 0 0 !important; }
+.autor-app { color:#FFFFFF !important; font-weight:800 !important; }
+.seccion-titulo {
+    background:linear-gradient(90deg,#0B4F8A,#1976C8) !important;
+    padding:10px 20px !important;
+    border-radius:8px !important;
+    font-weight:800 !important;
+    letter-spacing:.05em !important;
+    text-transform:uppercase !important;
+    margin:22px 0 14px 0 !important;
+}
+
+/* =========================================================
+   TARJETAS CLARAS: letras oscuras
+   ========================================================= */
 .card, .diag-panel,
 [data-testid="stAlert"],
 [data-testid="stMetric"],
 [data-testid="stExpander"],
-[data-testid="stForm"],
-.element-container,
-.css-card-fix {
-    color: #111827 !important;
+[data-testid="stForm"] {
+    background:#FFFFFF !important;
+    color:#111827 !important;
 }
 .card *, .diag-panel *,
 [data-testid="stAlert"] *,
 [data-testid="stMetric"] *,
 [data-testid="stExpander"] *,
 [data-testid="stForm"] * {
-    color: #111827 !important;
+    color:#111827 !important;
 }
+.card {
+    border-radius:14px !important;
+    padding:22px 24px !important;
+    margin-bottom:12px !important;
+    box-shadow:0 2px 12px rgba(0,0,0,.07) !important;
+    border-top:4px solid #1976C8 !important;
+}
+.card-consultorio { border-color:#1976C8 !important; }
+.card-mdpa { border-color:#17A589 !important; }
+.card-mapa { border-color:#7B68EE !important; }
+.card-diurno { border-color:#F39C12 !important; }
+.card-nocturno { border-color:#5D6D7E !important; }
+.card-title { font-weight:800 !important; font-size:.92em !important; letter-spacing:.04em !important; text-transform:uppercase !important; margin-bottom:12px !important; }
+.card-title.ct-cons { color:#0B4F8A !important; }
+.card-title.ct-mdpa { color:#0F766E !important; }
+.card-title.ct-mapa { color:#5B21B6 !important; }
+.card-title.ct-diu { color:#92400E !important; }
+.card-title.ct-noc { color:#334155 !important; }
+.diag-panel { border-radius:14px !important; padding:28px 32px !important; margin-top:22px !important; box-shadow:0 2px 16px rgba(0,0,0,.08) !important; border-left:6px solid #1976C8 !important; }
 
-/* Restaurar colores de títulos específicos de tarjetas, pero visibles */
-.card-title.ct-cons { color: #0B4F8A !important; }
-.card-title.ct-mdpa { color: #0F766E !important; }
-.card-title.ct-mapa { color: #5B21B6 !important; }
-.card-title.ct-diu  { color: #92400E !important; }
-.card-title.ct-noc  { color: #334155 !important; }
-
-/* Botones: fondo azul, texto blanco */
-.stButton > button,
-.stDownloadButton > button,
-button[kind="primary"],
-button[kind="secondary"] {
-    background: #0B4F8A !important;
-    color: #FFFFFF !important;
-    border: 2px solid #0B4F8A !important;
-    font-weight: 800 !important;
-}
-.stButton > button *,
-.stDownloadButton > button *,
-button[kind="primary"] *,
-button[kind="secondary"] * {
-    color: #FFFFFF !important;
-}
-.stButton > button:hover,
-.stDownloadButton > button:hover {
-    background: #063B6B !important;
-    color: #FFFFFF !important;
-    border-color: #063B6B !important;
-}
-
-/* Inputs y selects: fondo blanco, texto negro */
+/* =========================================================
+   INPUTS, SELECTS, CHECKBOXES: siempre legibles
+   ========================================================= */
 input, textarea, select,
 .stTextInput input,
 .stNumberInput input,
@@ -499,299 +228,120 @@ input, textarea, select,
 [data-baseweb="input"] input,
 [data-baseweb="textarea"] textarea,
 [data-baseweb="select"],
-[data-baseweb="select"] *,
-[data-baseweb="popover"],
-[data-baseweb="popover"] *,
-ul[role="listbox"],
-ul[role="listbox"] *,
-div[role="listbox"],
-div[role="option"] {
-    background-color: #FFFFFF !important;
-    color: #111827 !important;
-    caret-color: #111827 !important;
+[data-baseweb="select"] * {
+    background:#FFFFFF !important;
+    color:#111827 !important;
+    border-color:#94A3B8 !important;
+    caret-color:#111827 !important;
 }
-input::placeholder, textarea::placeholder {
-    color: #475569 !important;
-    opacity: 1 !important;
-}
-
-/* Checkboxes / radio */
-.stCheckbox, .stCheckbox *,
-.stRadio, .stRadio *,
-[data-baseweb="checkbox"] *,
-[data-baseweb="radio"] * {
-    color: #111827 !important;
+input::placeholder, textarea::placeholder { color:#475569 !important; opacity:1 !important; }
+.stTextInput label, .stNumberInput label, .stDateInput label,
+.stSelectbox label, .stMultiSelect label, .stCheckbox label, .stRadio label,
+.stCheckbox span, .stRadio span,
+[data-baseweb="checkbox"] *, [data-baseweb="radio"] * {
+    color:#111827 !important;
+    font-weight:700 !important;
 }
 
-/* Tabs: no dejar texto negro en tab azul */
-.stTabs [data-baseweb="tab-list"] {
-    background-color: #FFFFFF !important;
+/* =========================================================
+   BOTONES PRINCIPALES: fondo azul = letra blanca
+   ========================================================= */
+.stButton > button, .stDownloadButton > button,
+button[kind="primary"], button[kind="secondary"] {
+    background:#0B4F8A !important;
+    color:#FFFFFF !important;
+    border:2px solid #0B4F8A !important;
+    border-radius:10px !important;
+    padding:12px 28px !important;
+    font-weight:800 !important;
+    box-shadow:0 4px 14px rgba(11,79,138,.25) !important;
+    min-height:44px !important;
 }
-.stTabs [data-baseweb="tab"] {
-    background-color: #E5E7EB !important;
-    color: #111827 !important;
-}
-.stTabs [data-baseweb="tab"] *,
-.stTabs [data-baseweb="tab"] p,
-.stTabs [data-baseweb="tab"] span {
-    color: #111827 !important;
-}
-.stTabs [data-baseweb="tab"][aria-selected="true"],
-.stTabs [aria-selected="true"] {
-    background-color: #0B4F8A !important;
-    color: #FFFFFF !important;
-}
-.stTabs [data-baseweb="tab"][aria-selected="true"] *,
-.stTabs [data-baseweb="tab"][aria-selected="true"] p,
-.stTabs [aria-selected="true"] *,
-.stTabs [aria-selected="true"] p,
-.stTabs [aria-selected="true"] span {
-    color: #FFFFFF !important;
-}
+.stButton > button *, .stDownloadButton > button *, button[kind="primary"] *, button[kind="secondary"] * { color:#FFFFFF !important; }
+.stButton > button:hover, .stDownloadButton > button:hover { background:#063B6B !important; border-color:#063B6B !important; color:#FFFFFF !important; }
 
-/* Semáforos y badges sobre fondos claros: siempre negro */
-.sema-pill, .sema-pill *,
-.chip, .chip *,
-.badge, .badge *,
-.sema-chip-negro,
-.sema-chip-negro * {
-    color: #000000 !important;
-}
+/* =========================================================
+   TABS
+   ========================================================= */
+.stTabs [data-baseweb="tab-list"] { background:#FFFFFF !important; border-radius:10px !important; padding:4px !important; box-shadow:0 1px 6px rgba(0,0,0,.07) !important; }
+.stTabs [data-baseweb="tab"] { background:#E5E7EB !important; color:#111827 !important; border-radius:8px !important; font-weight:800 !important; }
+.stTabs [data-baseweb="tab"] *, .stTabs [data-baseweb="tab"] p, .stTabs [data-baseweb="tab"] span { color:#111827 !important; }
+.stTabs [aria-selected="true"], .stTabs [data-baseweb="tab"][aria-selected="true"] { background:#0B4F8A !important; color:#FFFFFF !important; }
+.stTabs [aria-selected="true"] *, .stTabs [aria-selected="true"] p, .stTabs [aria-selected="true"] span,
+.stTabs [data-baseweb="tab"][aria-selected="true"] * { color:#FFFFFF !important; }
 
-/* Avisos de Streamlit: texto negro sobre fondos claros */
-[data-testid="stAlert"] div,
-[data-testid="stAlert"] p,
-[data-testid="stAlert"] span,
-[data-testid="stAlert"] strong,
-[data-testid="stAlert"] li {
-    color: #111827 !important;
-}
+/* =========================================================
+   SEMÁFOROS/BADGES: fondos claros = letras negras
+   ========================================================= */
+.sema-pill { display:inline-block; padding:4px 14px; border-radius:20px; font-weight:800; font-size:1.05em; margin:2px 4px; letter-spacing:.02em; border:2px solid transparent; }
+.sema-verde { background:#D4EDDA !important; color:#000000 !important; border-color:#1B7E4A !important; }
+.sema-amarillo { background:#FFF3CD !important; color:#000000 !important; border-color:#856404 !important; }
+.sema-naranja { background:#FFE0C2 !important; color:#000000 !important; border-color:#7D3C00 !important; }
+.sema-rojo { background:#F8D7DA !important; color:#000000 !important; border-color:#7B1217 !important; }
+.sema-pill, .sema-pill *, .chip, .chip *, .badge, .badge *, .sema-chip-negro, .sema-chip-negro * { color:#000000 !important; }
+.badge { display:inline-block; padding:8px 22px; border-radius:24px; font-weight:800; font-size:1em; letter-spacing:.03em; }
+.badge-normal { background:#D4EDDA !important; border:2px solid #1B7E4A !important; }
+.badge-bata { background:#D6EAF8 !important; border:2px solid #1565C0 !important; }
+.badge-enmasc { background:#FFE0C2 !important; border:2px solid #E67E22 !important; }
+.badge-sostenida { background:#F8D7DA !important; border:2px solid #C0392B !important; }
+.chip { display:inline-block; padding:3px 12px; border-radius:12px; font-weight:800; font-size:.82em; }
+.chip-b { background:#D4EDDA !important; }
+.chip-m { background:#FFF3CD !important; }
+.chip-ma { background:#FFE0C2 !important; }
+.chip-a { background:#F8D7DA !important; }
 
-/* Dataframes y tablas */
-[data-testid="stDataFrame"],
-[data-testid="stDataFrame"] *,
-[data-testid="stTable"],
-[data-testid="stTable"] *,
-table, thead, tbody, tr, td, th {
-    color: #111827 !important;
+/* =========================================================
+   MENÚS FLOTANTES, BARRA DERECHA, POPOVERS: fondo claro = texto oscuro
+   ========================================================= */
+[data-testid="stToolbar"], [data-testid="stToolbar"] *,
+[data-testid="stDecoration"], [data-testid="stDecoration"] *,
+[data-testid="stStatusWidget"], [data-testid="stStatusWidget"] *,
+[data-testid="stHeader"], [data-testid="stHeader"] *,
+div[data-baseweb="popover"], div[data-baseweb="popover"] *,
+div[data-baseweb="menu"], div[data-baseweb="menu"] *,
+ul[data-baseweb="menu"], ul[data-baseweb="menu"] *,
+ul[role="menu"], ul[role="menu"] *,
+div[role="menu"], div[role="menu"] *,
+li[role="menuitem"], li[role="menuitem"] *,
+div[role="dialog"], div[role="dialog"] *,
+div[data-testid="stPopover"], div[data-testid="stPopover"] *,
+ul[role="listbox"], ul[role="listbox"] *,
+div[role="listbox"], div[role="listbox"] *,
+div[role="option"], div[role="option"] *,
+li[role="option"], li[role="option"] * {
+    background-color:#FFFFFF !important;
+    color:#111827 !important;
+    border-color:#CBD5E1 !important;
 }
+div[role="option"][aria-selected="true"], div[role="option"][aria-selected="true"] *,
+li[role="option"][aria-selected="true"], li[role="option"][aria-selected="true"] * { background:#D6EAF8 !important; color:#111827 !important; }
 
-/* Links visibles */
-a, a:visited {
-    color: #0B4F8A !important;
-    font-weight: 700 !important;
-}
-.app-header a, .seccion-titulo a,
-section[data-testid="stSidebar"] a {
-    color: #FFFFFF !important;
-}
+/* Dataframes/tablas */
+[data-testid="stDataFrame"], [data-testid="stDataFrame"] *, [data-testid="stTable"], [data-testid="stTable"] *, table, thead, tbody, tr, td, th { color:#111827 !important; }
 
-/* Diagnóstico/badges dentro de paneles claros: negro */
-.diag-panel .badge,
-.diag-panel .badge *,
-.card .badge,
-.card .badge * {
-    color: #000000 !important;
-}
+/* Links */
+a, a:visited { color:#0B4F8A !important; font-weight:700 !important; }
+.app-header a, .seccion-titulo a { color:#FFFFFF !important; }
+section[data-testid="stSidebar"] a, section[data-testid="stSidebar"] a:visited { color:#FFFFFF !important; font-weight:800 !important; }
 
-/* Responsivo móvil */
-@media (max-width: 768px) {
-    .block-container {
-        padding-left: 0.75rem !important;
-        padding-right: 0.75rem !important;
-        padding-top: 0.8rem !important;
-    }
-    .app-header {
-        padding: 20px 16px !important;
-        border-radius: 14px !important;
-    }
-    .app-header h1 {
-        font-size: 1.35rem !important;
-        line-height: 1.15 !important;
-        color: #FFFFFF !important;
-    }
-    .app-header p, .app-header span, .autor-app {
-        color: #FFFFFF !important;
-        font-size: 0.88rem !important;
-    }
-    .card, .diag-panel {
-        background-color: #FFFFFF !important;
-        color: #111827 !important;
-        padding: 16px 14px !important;
-        border-radius: 12px !important;
-    }
-    .card *, .diag-panel * {
-        color: #111827 !important;
-    }
-    .seccion-titulo, .seccion-titulo * {
-        color: #FFFFFF !important;
-    }
-    .stButton > button,
-    .stDownloadButton > button {
-        width: 100% !important;
-        min-height: 46px !important;
-        color: #FFFFFF !important;
-        background-color: #0B4F8A !important;
-        white-space: normal !important;
-        line-height: 1.2 !important;
-    }
-    input, textarea, select,
-    [data-baseweb="select"], [data-baseweb="select"] * {
-        background-color: #FFFFFF !important;
-        color: #111827 !important;
-        font-size: 16px !important;
-    }
-    .stTabs [data-baseweb="tab"] {
-        padding-left: 8px !important;
-        padding-right: 8px !important;
-        font-size: 0.85rem !important;
-    }
-    .stTabs [aria-selected="true"] *,
-    .stTabs [data-baseweb="tab"][aria-selected="true"] * {
-        color: #FFFFFF !important;
-    }
-}
+/* Scrollbar visible */
+::-webkit-scrollbar { width:12px; height:12px; }
+::-webkit-scrollbar-track { background:#E5E7EB; }
+::-webkit-scrollbar-thumb { background:#0B4F8A; border-radius:10px; border:2px solid #E5E7EB; }
+::-webkit-scrollbar-thumb:hover { background:#063B6B; }
 
-
-/* ============ CORRECCIÓN EXTRA: BARRA / MENÚ DERECHO Y PANELES FLOTANTES ============
-   Evita texto blanco sobre fondo blanco en barra derecha, menú de Streamlit,
-   desplegables, popovers, tooltips y paneles laterales emergentes. */
-
-/* Barra superior/derecha de Streamlit y botones de menú */
-[data-testid="stToolbar"],
-[data-testid="stToolbar"] *,
-[data-testid="stDecoration"],
-[data-testid="stDecoration"] *,
-[data-testid="stStatusWidget"],
-[data-testid="stStatusWidget"] *,
-[data-testid="stHeader"],
-[data-testid="stHeader"] * {
-    color: #111827 !important;
+/* Mobile */
+@media (max-width:768px) {
+    .block-container { padding-left:.75rem !important; padding-right:.75rem !important; padding-top:.8rem !important; }
+    .app-header { padding:20px 16px !important; border-radius:14px !important; }
+    .app-header h1 { font-size:1.35rem !important; line-height:1.15 !important; }
+    .app-header p, .app-header span, .autor-app { font-size:.88rem !important; color:#FFFFFF !important; }
+    .card, .diag-panel { padding:16px 14px !important; border-radius:12px !important; }
+    .badge { display:block !important; width:100% !important; text-align:center !important; white-space:normal !important; line-height:1.25 !important; }
+    .stButton > button, .stDownloadButton > button { width:100% !important; min-height:46px !important; white-space:normal !important; line-height:1.2 !important; }
+    input, textarea, select, [data-baseweb="select"], [data-baseweb="select"] * { font-size:16px !important; }
+    .stTabs [data-baseweb="tab"] { padding-left:8px !important; padding-right:8px !important; font-size:.85rem !important; }
 }
-
-[data-testid="stToolbar"] button,
-[data-testid="stToolbar"] button *,
-[data-testid="stStatusWidget"] button,
-[data-testid="stStatusWidget"] button * {
-    color: #111827 !important;
-    background-color: #FFFFFF !important;
-    border-color: #CBD5E1 !important;
-}
-
-/* Menú desplegable superior derecho / paneles flotantes */
-div[data-baseweb="popover"],
-div[data-baseweb="popover"] *,
-div[data-baseweb="menu"],
-div[data-baseweb="menu"] *,
-ul[data-baseweb="menu"],
-ul[data-baseweb="menu"] *,
-ul[role="menu"],
-ul[role="menu"] *,
-div[role="menu"],
-div[role="menu"] *,
-li[role="menuitem"],
-li[role="menuitem"] *,
-div[role="dialog"],
-div[role="dialog"] *,
-div[data-testid="stPopover"],
-div[data-testid="stPopover"] * {
-    background-color: #FFFFFF !important;
-    color: #111827 !important;
-    border-color: #CBD5E1 !important;
-}
-
-/* Dropdowns y opciones seleccionables */
-ul[role="listbox"],
-ul[role="listbox"] *,
-div[role="listbox"],
-div[role="listbox"] *,
-div[role="option"],
-div[role="option"] *,
-li[role="option"],
-li[role="option"] * {
-    background-color: #FFFFFF !important;
-    color: #111827 !important;
-}
-
-div[role="option"][aria-selected="true"],
-div[role="option"][aria-selected="true"] *,
-li[role="option"][aria-selected="true"],
-li[role="option"][aria-selected="true"] * {
-    background-color: #D6EAF8 !important;
-    color: #111827 !important;
-}
-
-/* Scrollbar vertical derecha: visible y profesional */
-::-webkit-scrollbar {
-    width: 12px;
-    height: 12px;
-}
-::-webkit-scrollbar-track {
-    background: #E5E7EB;
-}
-::-webkit-scrollbar-thumb {
-    background: #0B4F8A;
-    border-radius: 10px;
-    border: 2px solid #E5E7EB;
-}
-::-webkit-scrollbar-thumb:hover {
-    background: #063B6B;
-}
-
-/* Excepción: sidebar izquierda azul debe conservar texto blanco */
-section[data-testid="stSidebar"],
-section[data-testid="stSidebar"] *:not(input):not(textarea):not(select):not(button) {
-    color: #FFFFFF !important;
-}
-section[data-testid="stSidebar"] button,
-section[data-testid="stSidebar"] button * {
-    background-color: #FFFFFF !important;
-    color: #0B4F8A !important;
-}
-
-/* Excepción: botones principales fuera de sidebar siguen azul con texto blanco */
-.main .stButton > button,
-.main .stDownloadButton > button,
-div[data-testid="stVerticalBlock"] .stButton > button,
-div[data-testid="stVerticalBlock"] .stDownloadButton > button {
-    background-color: #0B4F8A !important;
-    color: #FFFFFF !important;
-    border-color: #0B4F8A !important;
-}
-.main .stButton > button *,
-.main .stDownloadButton > button *,
-div[data-testid="stVerticalBlock"] .stButton > button *,
-div[data-testid="stVerticalBlock"] .stDownloadButton > button * {
-    color: #FFFFFF !important;
-}
-
-/* Tarjetas oscuras/azules: texto siempre blanco */
-.app-header,
-.app-header *,
-.seccion-titulo,
-.seccion-titulo * {
-    color: #FFFFFF !important;
-}
-
-/* Tarjetas claras: texto siempre oscuro */
-.card,
-.card *,
-.diag-panel,
-.diag-panel *,
-[data-testid="stAlert"],
-[data-testid="stAlert"] *,
-[data-testid="stExpander"],
-[data-testid="stExpander"] * {
-    color: #111827 !important;
-}
-
-/* Pero títulos de sección internos conservan contraste */
-.card-title.ct-cons { color: #0B4F8A !important; }
-.card-title.ct-mdpa { color: #0F766E !important; }
-.card-title.ct-mapa { color: #5B21B6 !important; }
-.card-title.ct-diu  { color: #92400E !important; }
-.card-title.ct-noc  { color: #334155 !important; }
-
 </style>
 """, unsafe_allow_html=True)
 
